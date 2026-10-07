@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added account-specific desktop model discovery, validated session model selection, and streamed tool progress using existing Pi and Claude SDK events.
+
+- Added desktop sign-in orchestration for Codex OAuth and the SDK-bundled Claude CLI, with isolated profiles and cancellable prompts.
+
+- Added a desktop runtime with Claude Agent SDK support, shared conversation history, bounded account recovery on confirmed exhaustion, and Git-backed historical code snapshots.
+- Added working-tree browsing, native Codex credential adaptation, manual account handoff during runs, read-only AI snapshot reviews, and historical line provenance.
+
 ## [1.0.1] - 2026-10-03
 
 ### New Features

@@ -1,7 +1,5 @@
-import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
 
-const telemetrySrcIndex = fileURLToPath(new URL("../telemetry/src/index.ts", import.meta.url));
 
 export default defineConfig({
 	test: {
@@ -12,6 +10,5 @@ export default defineConfig({
 		silent: "passed-only",
 	},
 	resolve: {
-		alias: [{ find: /^@earendil-works\/pi-telemetry$/, replacement: telemetrySrcIndex }],
 	},
 });

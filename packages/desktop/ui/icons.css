@@ -1,0 +1,20 @@
+/* Generated from @phosphor-icons/core 2.1.1. Run npm run icons --workspace packages/desktop. */
+.icon { display: inline-block; width: 16px; height: 16px; flex-shrink: 0; background: currentColor; mask: var(--icon-url) center / contain no-repeat; }
+.icon-moon { --icon-url: url('icons/moon.svg'); }
+.icon-sun { --icon-url: url('icons/sun.svg'); }
+.icon-plus { --icon-url: url('icons/plus.svg'); }
+.icon-folder-open { --icon-url: url('icons/folder-open.svg'); }
+.icon-chat-circle { --icon-url: url('icons/chat-circle.svg'); }
+.icon-clock-counter-clockwise { --icon-url: url('icons/clock-counter-clockwise.svg'); }
+.icon-gear-six { --icon-url: url('icons/gear-six.svg'); }
+.icon-caret-right { --icon-url: url('icons/caret-right.svg'); }
+.icon-arrow-up { --icon-url: url('icons/arrow-up.svg'); }
+.icon-square { --icon-url: url('icons/square.svg'); }
+.icon-x { --icon-url: url('icons/x.svg'); }
+.icon-code { --icon-url: url('icons/code.svg'); }
+.icon-terminal { --icon-url: url('icons/terminal.svg'); }
+.icon-check-circle { --icon-url: url('icons/check-circle.svg'); }
+.icon-arrows-clockwise { --icon-url: url('icons/arrows-clockwise.svg'); }
+.icon-warning-circle { --icon-url: url('icons/warning-circle.svg'); }
+.icon-note-pencil { --icon-url: url('icons/note-pencil.svg'); }
+.icon-sidebar-simple { --icon-url: url('icons/sidebar-simple.svg'); }
