@@ -1,43 +1,32 @@
 {
-	"name": "relay-desktop",
+	"name": "relay",
 	"private": true,
 	"type": "module",
 	"workspaces": [
-		"packages/ai",
-		"packages/agent",
-		"packages/tui",
-		"packages/coding-agent",
-		"packages/desktop",
-		"packages/app"
+		"apps/desktop",
+		"packages/core"
 	],
 	"scripts": {
-		"desktop": "npm run start --workspace packages/desktop",
-		"relay": "node packages/app/src/cli.ts",
-		"relay:pi": "node packages/app/src/terminal/main.ts",
-		"relay:service": "node packages/app/src/service/main.ts",
-		"clean": "npm run clean --workspaces",
+		"start": "node packages/core/src/terminal/main.ts",
+		"desktop": "npm run start --workspace @relay/desktop --",
+		"preview": "npm run preview --workspace @relay/desktop --",
+		"build:desktop": "node apps/desktop/scripts/package.mjs",
+		"relay": "node packages/core/src/cli.ts",
+		"relay:pi": "node packages/core/src/terminal/main.ts",
+		"relay:service": "node packages/core/src/service/main.ts",
 		"check:pinned-deps": "node scripts/check-pinned-deps.mjs",
 		"check:runtime-deps": "node scripts/check-runtime-deps.mjs",
 		"check:ts-imports": "node scripts/check-ts-relative-imports.mjs",
-		"check:entry-graphs": "node scripts/check-entry-graphs.mjs",
 		"check:relay-boundaries": "node scripts/check-relay-boundaries.mjs",
-		"generate:models": "npm --prefix packages/ai run generate-models",
-		"hydrate:model-data": "npm --prefix packages/ai run hydrate-model-data",
-		"check:model-data": "npm --prefix packages/ai run check:model-data",
-		"start": "node packages/app/src/terminal/main.ts",
-		"start:legacy": "node --import ./packages/coding-agent/src/source-resolver.ts ./packages/coding-agent/src/cli.ts",
-		"build": "npm run build --workspace=packages/tui && npm run build --workspace=packages/ai && npm run build --workspace=packages/agent && npm run build --workspace=packages/coding-agent",
-		"build:offline": "npm run build --workspace=packages/tui && npm run build:offline --workspace=packages/ai && npm run build --workspace=packages/agent && npm run build --workspace=packages/coding-agent",
-		"check": "biome check --write --error-on-warnings . && npm run check:pinned-deps && npm run check:runtime-deps && npm run check:ts-imports && npm run check:entry-graphs && npm run check:relay-boundaries && tsc --noEmit && tsc --project packages/app/tsconfig.json && npm run check:browser-smoke",
 		"check:browser-smoke": "node scripts/check-browser-smoke.mjs",
-		"test": "npm run test --workspaces --if-present"
+		"check": "biome check --write --error-on-warnings . && npm run check:pinned-deps && npm run check:runtime-deps && npm run check:ts-imports && npm run check:relay-boundaries && tsc --noEmit && npm run check:browser-smoke",
+		"test": "node scripts/test.mjs"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.3.5",
 		"@types/node": "22.19.19",
 		"esbuild": "0.28.2",
 		"husky": "9.1.7",
-		"shx": "0.4.0",
 		"typescript": "7.0.2"
 	},
 	"engines": {
@@ -46,5 +35,6 @@
 	"version": "0.0.3",
 	"overrides": {
 		"protobufjs": "7.6.6"
-	}
+	},
+	"description": "Local coding workspace for Codex, Claude, and pi"
 }

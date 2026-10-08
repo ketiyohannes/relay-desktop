@@ -12,8 +12,12 @@ export function checkSource(file, content) {
 	const inspect = (specifier) => {
 		if (specifier.startsWith(".")) {
 			const target = resolve(dirname(file), specifier);
+			if (file.startsWith(resolve(root, "packages/core") + sep) && target.startsWith(resolve(root, "apps") + sep))
+				failures.push(`core imports frontend: ${specifier}`);
 			if (retired.some((directory) => target === directory || target.startsWith(`${directory}${sep}`)))
 				failures.push(`imports retired fork: ${specifier}`);
+		} else if (file.startsWith(resolve(root, "packages/core") + sep) && (specifier === "@relay/desktop" || specifier.startsWith("@relay/desktop/"))) {
+			failures.push(`core imports frontend: ${specifier}`);
 		} else if (specifier.startsWith("@earendil-works/pi-") || specifier.includes("node_modules/") || specifier.startsWith("/")) {
 			failures.push(`bypasses published aliases: ${specifier}`);
 		}
@@ -72,7 +76,7 @@ export function checkSource(file, content) {
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
 	const failures = [];
-	for (const directory of ["packages/app/src", "packages/app/test", "packages/desktop/src"]) {
+	for (const directory of ["packages/core/src", "packages/core/test", "apps/desktop/src"]) {
 		const base = resolve(root, directory);
 		for (const name of readdirSync(base, { recursive: true })) {
 			if (!/\.(?:ts|js|mjs)$/.test(name)) continue;
