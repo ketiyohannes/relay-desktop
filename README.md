@@ -1,34 +1,73 @@
-# Relay Desktop
+# Relay
 
-A minimal fork of [Pi](https://github.com/earendil-works/pi), retaining its local coding-agent core. No desktop shell has been added yet.
+Relay is a local coding workspace with a shared conversation across Codex App Server,
+Claude Agent SDK, and published pi npm packages. Relay owns sessions, public history,
+approvals, and recovery. Each backend owns its agent loop and tools.
 
-| Package | Purpose |
-| --- | --- |
-| `packages/ai` | Model providers, authentication, streaming, and shared message types. |
-| `packages/agent` | Agent loop, conversation state, and tool execution. |
-| `packages/coding-agent` | CLI, coding tools, sessions, and extension API. |
-| `packages/tui` | Interactive terminal interface and rendering. |
+## Project layout
 
-Removed: experimental client/server/protocol and durable runtimes, Chord, telemetry package, evals, MCP, codemode, and all built-in extensions. The extension API remains available for future additions.
+```text
+apps/desktop/       Electron shell, preload bridge, worker, and browser UI
+packages/core/      Shared application service, native adapters, CLI, and terminal host
+docs/               Architecture and operational limitations
+scripts/            Repository checks and offline test runner
+```
+
+There is no vendored pi agent, provider library, or terminal implementation.
+The pi backend uses exact-pinned `pi-sdk`, `pi-ai`, and `pi-tui` npm aliases.
+See [architecture](docs/architecture.md), [core services](packages/core/README.md),
+and [desktop setup](apps/desktop/README.md).
 
 ## Development
 
-Requires Node.js 22.19 or newer.
+Use Node.js 22.19 or newer.
 
 ```sh
 npm install --ignore-scripts
-npm run hydrate:model-data
+npm run desktop
+npm run preview
+npm run relay -- --help
 npm start -- --help
-npm start
 npm run check
+./test.sh
 ```
 
-`npm start` runs TypeScript directly using the retained workspace source resolver. Model catalog hydration is needed before normal startup; a fresh clone does not contain generated provider JSON.
+Electron needs its separately authorized installation script; see desktop setup.
+`RELAY_NODE_PATH` selects the Node executable for the desktop worker.
+Codex requires an installed CLI; `RELAY_CODEX_PATH` selects it. Claude uses the
+Agent SDK. Inference requires the selected backend's authentication.
 
-The application command and configuration remain `pi` and `~/.pi/agent` for now. Default tools are `read`, `bash`, `edit`, and `write`. Interactive, print, JSON, and RPC modes and session persistence remain intact.
+`npm run check` checks formatting, dependency pins, declared runtime imports,
+public dependency boundaries, TypeScript, and desktop asset/entry resolution.
+`./test.sh` runs Relay's offline tests in an isolated environment without provider keys.
+It does not run upstream pi tests or live inference.
 
-The root scripts retain a build pipeline for the four packages. `./test.sh` runs tests in an isolated environment without API credentials.
+## Shared conversations
 
-## Origin and license
+```sh
+npm run relay -- new --workspace /path/to/project --backend codex
+npm run relay -- chat --session SESSION_ID
+```
 
-Forked from `earendil-works/pi` at `4c6fb7cfe`. Original authorship and the MIT license are preserved in `LICENSE` and package metadata. `origin` points to Relay Desktop; `upstream` points to Pi.
+Inside chat, `/switch claude MODEL` and `/switch pi MODEL PROVIDER` select the next
+runtime. `/allow ID`, `/deny ID`, and `/cancel` control execution. Runtime selection
+JSON can be supplied with `--config PATH` on `new` or `switch`.
+
+`npm start` and `npm run relay:pi` host the published pi terminal.
+`--relay-session SESSION_ID` connects it to an existing Relay conversation.
+In interactive mode, `/relay-switch codex`, `/relay-switch claude`, and
+`/relay-switch pi MODEL PROVIDER` route subsequent prompts in the same terminal.
+Pi extensions remain pi extensions; they do not execute inside Codex or Claude.
+
+`npm run relay:service` runs the shared local service explicitly. Frontends normally
+start it automatically. Data defaults to the OS application-data location for Relay.
+`RELAY_DATA_DIR` changes the product root; `RELAY_APP_DIR` selects the service directory.
+Credentials stay in provider profiles, outside the conversation ledger.
+
+## Attribution
+
+Relay originated from the pi repository and retains adapted product code.
+Original MIT attribution remains in [LICENSE](LICENSE); see
+[third-party notices](THIRD_PARTY_NOTICES.md). Pi is now an npm dependency.
+Claude SDK has separate terms. Removing vendored source does not erase attribution
+or rewrite Git history.

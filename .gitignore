@@ -1,21 +1,15 @@
 node_modules/
 dist/
+.runtime/
 .artifacts/
+coverage/
 *.log
-.DS_Store
 *.tsbuildinfo
-# packages/*/node_modules/
-packages/*/dist/
-packages/*/dist-chrome/
-packages/*/dist-firefox/
-packages/ai/src/providers/data/
-packages/ai/src/providers/.model-generation-*/
 *.cpuprofile
-
-# Environment
+.DS_Store
 .env
-
-# Editor files
+.env.*
+!.env.example
 .vscode/
 .zed/
 .idea/
@@ -23,23 +17,26 @@ packages/ai/src/providers/.model-generation-*/
 *.swp
 *.swo
 *~
-
-# Package specific
 .npm/
-coverage/
 .nyc_output/
+
+# Local agent configuration and scratch artifacts
 .pi_config/
+.opencode/
+.pi/hf-sessions/
+.pi/hf-sessions-backup/
 tui-debug.log
 compaction-results/
-.opencode/
 syntax.jsonl
 out.jsonl
 pi-*.html
 out.html
-packages/coding-agent/binaries/
 todo.md
 plans/
-.pi/hf-sessions/
-.pi/hf-sessions-backup/
 collect.sh
-packages/agent/docs/extensions/pi-server-artifact/index.md
+
+# Browser assets generated from desktop dependencies
+apps/desktop/ui/marked.js
+apps/desktop/ui/highlight.js
+apps/desktop/ui/diff.js
+apps/desktop/ui/vendor-licenses/
