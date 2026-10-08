@@ -3,7 +3,8 @@ import { randomUUID } from "node:crypto";
 import { realpath } from "node:fs/promises";
 import { join } from "node:path";
 import { app, BrowserWindow, ipcMain, shell } from "electron";
-import type { DesktopCommand, DesktopLogin, DesktopState } from "../../coding-agent/src/desktop/types.ts";
+import type { DesktopCommand, DesktopLogin, DesktopState } from "../../app/src/desktop/types.ts";
+import { applicationDirectory } from "../../app/src/service/paths.ts";
 
 const root = process.env.RELAY_REPOSITORY;
 if (!root) throw new Error("Launch Relay with npm run desktop");
@@ -81,10 +82,10 @@ async function startDesktop(root: string): Promise<void> {
 	});
 	worker = fork(join(root, "packages/desktop/src/worker.ts"), [join(app.getPath("userData"), "sessions")], {
 		execPath: process.env.RELAY_NODE_PATH || "node",
-		execArgv: ["--import", join(root, "packages/coding-agent/src/source-resolver.ts")],
+		execArgv: [],
 		stdio: ["ignore", "pipe", "pipe", "ipc"],
 		// Account credentials stay in the child; the renderer receives only account metadata.
-		env: { ...process.env },
+		env: { ...process.env, RELAY_APP_DIR: applicationDirectory() },
 	});
 	worker.stdout?.on("data", (data: Buffer) => process.stdout.write(data));
 	worker.stderr?.on("data", (data: Buffer) => process.stderr.write(data));

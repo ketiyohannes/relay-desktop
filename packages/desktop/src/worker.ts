@@ -1,41 +1,52 @@
-import { DesktopRuntime } from "../../coding-agent/src/desktop/runtime.ts";
-import type { DesktopCommand } from "../../coding-agent/src/desktop/types.ts";
+import { DesktopRuntime } from "../../app/src/desktop/runtime.ts";
+import type { DesktopCommand } from "../../app/src/desktop/types.ts";
 
 const approvals = new Map<string, (allowed: boolean) => void>();
-let allowedRun = false;
+const approvalScopes = new Map<string, string>();
+let allowedRunScope: string | undefined;
 const directory = process.argv[2];
 if (!directory || !process.send) throw new Error("Desktop worker requires an IPC channel and data directory");
 const runtime = new DesktopRuntime(directory, {
 	login: (login) => process.send?.({ type: "login", login }),
 	state: (state) => process.send?.({ type: "state", state }),
-	permission: (tool, input) =>
-		allowedRun
+	permission: (tool, input, scope, signal) =>
+		scope && allowedRunScope === `${scope.sessionId}:${scope.turnId}`
 			? Promise.resolve(true)
 			: new Promise<boolean>((resolve) => {
-					const id = crypto.randomUUID();
-					const timer = setTimeout(() => {
-						approvals.delete(id);
-						process.send?.({ type: "permission_closed", id });
+					if (signal?.aborted) {
 						resolve(false);
-					}, 120000);
-					approvals.set(id, (allowed) => {
+						return;
+					}
+					const id = crypto.randomUUID();
+					if (scope) approvalScopes.set(id, `${scope.sessionId}:${scope.turnId}`);
+					const settle = (allowed: boolean) => {
 						clearTimeout(timer);
+						signal?.removeEventListener("abort", aborted);
+						approvals.delete(id);
+						approvalScopes.delete(id);
 						process.send?.({ type: "permission_closed", id });
 						resolve(allowed);
-					});
+					};
+					const aborted = () => settle(false);
+					const timer = setTimeout(aborted, 120000);
+					approvals.set(id, settle);
+					signal?.addEventListener("abort", aborted, { once: true });
 					process.send?.({ type: "permission", id, tool, input });
 				}),
 });
 const ready = runtime.initialize();
 process.on("message", (message: { id: string; command?: DesktopCommand; allowed?: boolean; allowRun?: boolean }) => {
 	if (message.allowed !== undefined) {
-		if (approvals.has(message.id) && message.allowed && message.allowRun) allowedRun = true;
+		if (approvals.has(message.id) && message.allowed && message.allowRun)
+			allowedRunScope = approvalScopes.get(message.id);
 		approvals.get(message.id)?.(message.allowed);
 		approvals.delete(message.id);
+		approvalScopes.delete(message.id);
 		return;
 	}
 	if (!message.command) return;
-	if (["prompt", "review_snapshot", "cancel", "select_account"].includes(message.command.type)) allowedRun = false;
+	if (["prompt", "review_snapshot", "cancel", "select_account", "session_permissions"].includes(message.command.type))
+		allowedRunScope = undefined;
 	if (
 		message.command.type === "cancel" ||
 		(message.command.type === "select_account" &&
@@ -44,6 +55,7 @@ process.on("message", (message: { id: string; command?: DesktopCommand; allowed?
 	) {
 		for (const approval of approvals.values()) approval(false);
 		approvals.clear();
+		approvalScopes.clear();
 	}
 	void ready
 		.then(() => runtime.command(message.command!))

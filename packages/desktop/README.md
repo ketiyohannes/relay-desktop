@@ -1,5 +1,7 @@
 # Relay desktop
 
+The desktop execution path now uses `packages/app`: Codex App Server, Claude Agent SDK, and published pi packages share Relay's durable session service. See the [migration matrix](../../docs/native-runtime-migration.md) and [application README](../app/README.md) for current runtime behavior, approvals, persistence, validation, and compatibility gaps. The remaining descriptions and live verification history below describe the earlier desktop implementation and are preservation references, not validation of the new native adapters.
+
 Electron workspace with a project/session library, streaming conversation, expandable tool calls, and an ordered code timeline. The interface follows [T3 Code's workspace configuration](https://github.com/pingdotgg/t3code/tree/main/apps/web/src): neutral surfaces, compact sidebar rows, full-width conversation content with consistent gutters, and account controls inside a padded composer. The title-bar theme selector offers Light, Dark, and System, saving the choice across launches. System follows OS appearance changes automatically. The project sidebar can be collapsed, with its visibility also saved.
 
 Icons are the regular-weight SVGs from `@phosphor-icons/core`, pinned to 2.1.1. The selected assets and MIT license are included locally in `ui/icons` so Electron and the browser preview work offline. Regenerate them with `npm run icons --workspace packages/desktop`.

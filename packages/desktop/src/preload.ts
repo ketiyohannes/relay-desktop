@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron";
-import type { DesktopCommand, DesktopLogin, DesktopState } from "../../coding-agent/src/desktop/types.ts";
+import type { DesktopCommand, DesktopLogin, DesktopState } from "../../app/src/desktop/types.ts";
 
 contextBridge.exposeInMainWorld("relay", {
 	onLogin: (callback: (state: DesktopLogin) => void) => {

@@ -43,6 +43,8 @@
 		"packages/*/test/**/*"
 	],
 	"exclude": [
+		"packages/app/**",
+		"packages/desktop/**",
 		"**/dist/**"
 	]
 }
