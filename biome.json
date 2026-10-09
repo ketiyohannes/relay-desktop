@@ -10,9 +10,7 @@
 				"useNodejsImportProtocol": "off"
 			},
 			"suspicious": {
-				"noExplicitAny": "off",
-				"noControlCharactersInRegex": "off",
-				"noEmptyInterface": "off"
+				"noControlCharactersInRegex": "off"
 			}
 		}
 	},
@@ -20,17 +18,9 @@
 		"enabled": true,
 		"formatWithErrors": false,
 		"indentStyle": "tab",
-		"indentWidth": 3,
 		"lineWidth": 120
 	},
 	"files": {
-		"includes": [
-			"packages/*/src/**/*.ts",
-			"packages/*/test/**/*.ts",
-			"apps/*/src/**/*.ts",
-			"apps/*/test/**/*.ts",
-			"!**/node_modules/**/*",
-			"!!**/node_modules"
-		]
+		"includes": ["src/**/*.ts", "tests/**/*.ts"]
 	}
 }

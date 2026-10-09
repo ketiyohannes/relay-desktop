@@ -1,0 +1,20 @@
+Relay third-party notices
+
+Relay originated from `earendil-works/pi` at revision `4c6fb7cfe`.
+The vendored pi runtime workspaces have been removed. Adapted product code and repository
+history retain their original attribution; the MIT notice in `LICENSE` remains applicable.
+Removing source does not change a hosting provider's fork relationship or erase authorship.
+
+Runtime dependencies:
+
+- `pi-sdk`: `@earendil-works/pi-coding-agent` 1.1.0, MIT.
+- `pi-ai`: `@earendil-works/pi-ai` 1.1.0, MIT.
+- `pi-tui`: `@earendil-works/pi-tui` 1.0.4, MIT.
+- Claude Agent SDK: dependency licensing and commercial terms apply separately.
+- Codex App Server: supplied by the user's installed Codex CLI.
+
+Desktop assets use Marked (MIT), jsdiff (BSD-3-Clause), highlight.js (BSD-3-Clause),
+and Phosphor icons (MIT). Browser assets are generated from pinned npm dependencies;
+their notices are copied to `src/renderer/vendor-licenses`. Selected icons retain
+their notice in `src/renderer/icons/LICENSE`. Other dependencies retain their
+individual license notices in the installed packages.

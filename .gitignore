@@ -1,12 +1,13 @@
+# Dependencies and generated app output
 node_modules/
 dist/
 .runtime/
-.artifacts/
 coverage/
-*.log
 *.tsbuildinfo
 *.cpuprofile
+# Local credentials, editor settings, and scratch output
 .DS_Store
+*.log
 .env
 .env.*
 !.env.example
@@ -17,26 +18,10 @@ coverage/
 *.swp
 *.swo
 *~
-.npm/
-.nyc_output/
-
-# Local agent configuration and scratch artifacts
-.pi_config/
 .opencode/
-.pi/hf-sessions/
-.pi/hf-sessions-backup/
-tui-debug.log
-compaction-results/
-syntax.jsonl
-out.jsonl
-pi-*.html
-out.html
-todo.md
-plans/
-collect.sh
 
 # Browser assets generated from desktop dependencies
-apps/desktop/ui/marked.js
-apps/desktop/ui/highlight.js
-apps/desktop/ui/diff.js
-apps/desktop/ui/vendor-licenses/
+src/renderer/marked.js
+src/renderer/highlight.js
+src/renderer/diff.js
+src/renderer/vendor-licenses/

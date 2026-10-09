@@ -19,10 +19,10 @@
 - Inline single-line helpers that have only one call site.
 - Check node_modules for external API types; don't guess.
 - **No inline imports** (`await import()`, `import("pkg").Type`, dynamic type imports). Top-level imports only.
-- Shared application behavior belongs in `packages/core`; Electron and browser UI belong in `apps/desktop`. Core must not import frontend code.
+- Shared application behavior belongs in `src/core`; Electron process code belongs in `src/main` and `src/preload`, and browser UI belongs in `src/renderer`. Core must not import Electron or frontend code.
 - Use published pi APIs through the pinned npm aliases; never vendor pi internals.
 - Never remove or downgrade code to fix type errors from outdated deps; upgrade the dep instead.
-- Use only erasable TypeScript syntax (Node strip-only mode) in code checked by the root config (`packages/*/src`, `packages/*/test`, `apps/*/src`): no parameter properties, `enum`, `namespace`/`module`, `import =`, `export =`, or other constructs needing JS emit. Use explicit fields with constructor assignments.
+- Use only erasable TypeScript syntax (Node strip-only mode) in code checked by the root config (`src/**/*.ts`, `tests/**/*.ts`): no parameter properties, `enum`, `namespace`/`module`, `import =`, `export =`, or other constructs needing JS emit. Use explicit fields with constructor assignments.
 - Always ask before removing functionality or code that appears intentional.
 - Do not preserve backward compatibility unless the user asks for it.
 - Keep terminal keybindings configurable through published pi keybinding APIs.
@@ -32,9 +32,9 @@
 - After code changes (not docs): `npm run check` (full output, no tail). Fix all errors, warnings, and infos before committing. Does not run tests.
 - Never run `npm run build` or `npm test` unless requested by the user.
 - Run all offline Relay tests with `./test.sh` from the root. Never run an unrestricted Vitest suite or paid provider tests.
-- For focused core node:test tests, run `node --test test/specific.test.ts` from `packages/core`.
-- For focused core desktop Vitest tests, run `node ../../node_modules/vitest/dist/cli.js --run test/desktop/specific.test.ts` from `packages/core`.
-- For renderer tests, run `node --test test/code-view.test.mjs` from `apps/desktop`.
+- For focused core node:test tests, run `node --test tests/core/specific.test.ts` from the root.
+- For focused core desktop Vitest tests, run `node node_modules/vitest/dist/cli.js --run tests/core/desktop/specific.test.ts` from the root.
+- For renderer tests, run `node --test tests/renderer/code-view.test.mjs` from the root.
 - If you create or modify a test file, run it and iterate until it passes.
 - Native adapter tests use mocks or published pi's faux provider. No real keys or paid calls.
 - When regressions tests for fixing a github issue, add a comment with the github issue number next to the test.
@@ -47,7 +47,7 @@
 - When updating `undici`, you MUST read its changelog/release notes for the target version and evaluate whether any changes may affect functionality before applying the update.
 - Hydrate/update locally with `npm install --ignore-scripts`; clean/CI-style with `npm ci --ignore-scripts`. Don't run lifecycle scripts unless the user asks.
 - If dep metadata changes, refresh `package-lock.json` with `npm install --package-lock-only --ignore-scripts`.
-- Pre-commit blocks lockfile commits unless `PI_ALLOW_LOCKFILE_CHANGE=1`. Don't bypass unless the user wants the lockfile change committed.
+- Review lockfile changes before staging them. There is no repository-managed pre-commit hook.
 
 ## Git
 
@@ -72,7 +72,7 @@ If rebase conflicts occur:
 
 ## Issues and PRs
 
-See `CONTRIBUTING.md` for contribution and validation requirements.
+See `README.md` for setup, architecture, and validation requirements.
 
 When reviewing PRs:
 
@@ -96,7 +96,7 @@ When closing issues via commit:
 
 ## Changelog
 
-Location: `packages/*/CHANGELOG.md` or `apps/*/CHANGELOG.md` when the workspace has a changelog.
+Location: `CHANGELOG.md` when the application has a changelog.
 
 Sections under `## [Unreleased]`: `### Breaking Changes` (API changes requiring migration), `### Added`, `### Changed`, `### Fixed`, `### Removed`.
 
