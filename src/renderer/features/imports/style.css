@@ -1,0 +1,24 @@
+.import-launch { display: flex; align-items: center; gap: 8px; border: 0; margin: 0 0 12px; padding: 8px; text-align: left; color: var(--muted); font-size: 13px; flex-shrink: 0; }
+#session-search { width: 100%; min-width: 0; background: transparent; border: 1px solid var(--line); border-radius: 5px; color: var(--ink); padding: 6px 8px; margin: 0 0 6px; font-size: 12px; }
+#session-discovery { display: block; max-height: 72px; overflow: auto; white-space: pre-line; overflow-wrap: anywhere; font-size: 12px; line-height: 1.5; }
+#link-project { border: 0; font-size: 12px; color: var(--muted); white-space: nowrap; }
+#import-dialog { width: 940px; }
+#import-dialog[open] { display: flex; flex-direction: column; height: min(820px, 90vh); }
+#import-dialog > :not(.import-body) { flex-shrink: 0; }
+.import-source { display: flex; align-items: center; gap: 8px; }
+.import-source select { width: 104px; flex-shrink: 0; }
+.import-source input { min-width: 0; flex: 1; }
+.import-source :is(input, select) { margin: 0; font-family: var(--sans); }
+#import-status { overflow-wrap: anywhere; white-space: pre-line; max-height: 64px; overflow: auto; }
+.import-body { min-height: 160px; flex: 1; display: grid; grid-template-columns: minmax(220px, .9fr) minmax(0, 1.3fr); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.import-list { min-height: 0; display: flex; flex-direction: column; border-right: 1px solid var(--line); padding: 10px; }
+#import-search { margin: 0 0 10px; font-family: var(--sans); }
+#import-sessions { min-height: 0; overflow: auto; }
+.import-session { width: 100%; text-align: left; border: 1px solid transparent; padding: 10px; margin-bottom: 4px; }
+.import-session.selected { background: var(--hover); border-color: var(--line); }
+.import-session strong { display: block; font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.import-session small { display: block; font-size: 11px; color: var(--muted); overflow-wrap: anywhere; margin-top: 5px; }
+#import-preview { overflow: auto; padding: 20px; color: var(--ink); }
+#import-preview .message-body { font-size: 14px; }
+#import-warnings { margin: 12px 0; line-height: 1.5; max-height: 75px; overflow: auto; }
+#import-confirm { white-space: nowrap; align-self: center; }

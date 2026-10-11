@@ -1,4 +1,4 @@
-import type { AccountCatalogLoader } from "../../../src/core/desktop/accounts.ts";
+import type { AccountCatalogLoader } from "../../../src/core/accounts/catalog.ts";
 
 /** Synthetic auth/catalog for engine tests; never inspect the developer's credentials. */
 export const fakeAccountCatalog: AccountCatalogLoader = async (account) => ({

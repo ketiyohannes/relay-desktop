@@ -2,8 +2,9 @@ import { createHash } from "node:crypto";
 import { mkdir, open, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import type { AttachmentReference, ImageMediaType, RuntimeAttachment } from "../contracts.ts";
+import type { RuntimeAttachment } from "../runtimes/types.ts";
 import { syncDirectory } from "../storage/durable.ts";
+import type { AttachmentReference, ImageMediaType } from "./types.ts";
 
 export function imageMediaType(value: string): value is ImageMediaType {
 	return ["image/png", "image/jpeg", "image/gif", "image/webp"].includes(value);

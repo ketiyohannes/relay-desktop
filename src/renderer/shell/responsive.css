@@ -1,0 +1,9 @@
+.composer, .session-header, .routing, .account-button, .recent, .panel-label { flex-shrink: 0; }
+@keyframes pulse { 50% { opacity: .35; } }
+@media (max-width: 1200px) {
+  :root { --sidebar-width: 220px; --details-width: 260px; }
+  .session-header, .messages { padding-left: 20px; padding-right: 20px; }
+  .timeline { padding: 0 15px; }
+  .composer { margin: 0 16px; width: calc(100% - 32px); }
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; scroll-behavior: auto !important; } }

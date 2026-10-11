@@ -1,9 +1,6 @@
-import type { AccountCatalogLoader } from "../../../src/core/desktop/accounts.ts";
-import {
-	DesktopRuntime as ApplicationDesktopRuntime,
-	type DesktopEngine,
-	type RuntimeHost,
-} from "../../../src/core/desktop/runtime.ts";
+import type { AccountCatalogLoader } from "../../../src/core/accounts/catalog.ts";
+import { DesktopRuntime as ApplicationDesktopRuntime, type RuntimeHost } from "../../../src/core/desktop/commands.ts";
+import type { DesktopEngine } from "../../../src/core/sessions/conversation-runner.ts";
 
 /** Preserve product regressions without starting a service or using installed accounts. */
 export class DesktopRuntime extends ApplicationDesktopRuntime {
@@ -44,4 +41,4 @@ export class DesktopRuntime extends ApplicationDesktopRuntime {
 		return this.completion.promise;
 	}
 }
-export type { DesktopEngine } from "../../../src/core/desktop/runtime.ts";
+export type { DesktopEngine } from "../../../src/core/sessions/conversation-runner.ts";

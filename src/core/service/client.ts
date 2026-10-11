@@ -4,7 +4,7 @@ import { readFile } from "node:fs/promises";
 import { connect, type Socket } from "node:net";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import type { LedgerEvent, RelaySession } from "../contracts.ts";
+import type { LedgerEvent, RelaySession } from "../sessions/types.ts";
 import { serviceBuild } from "./build.ts";
 import { FrameReader, FrameWriter } from "./frames.ts";
 import type { HostedControl } from "./hosted.ts";

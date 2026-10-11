@@ -3,7 +3,7 @@ import { mkdtemp, readdir, readFile, realpath, rm, stat, writeFile } from "node:
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
-import { DesktopRuntime } from "../../src/core/desktop/runtime.ts";
+import { DesktopRuntime } from "../../src/core/desktop/commands.ts";
 import { DesktopStore } from "../../src/core/desktop/store.ts";
 import type { DesktopState, DesktopUpdate } from "../../src/core/desktop/types.ts";
 

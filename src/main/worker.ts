@@ -1,5 +1,5 @@
-import { DesktopRuntime } from "../core/desktop/runtime.ts";
-import type { DesktopCommand } from "../core/desktop/types.ts";
+import { DesktopRuntime } from "../core/desktop/commands.ts";
+import type { DesktopCommand } from "../core/desktop/protocol.ts";
 
 const approvals = new Map<string, (allowed: boolean) => void>();
 const approvalScopes = new Map<string, string>();

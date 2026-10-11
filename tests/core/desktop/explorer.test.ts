@@ -4,10 +4,11 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
 import { afterEach, expect, it } from "vitest";
-import { projectHistory } from "../../../src/core/desktop/history.ts";
-import { searchCode } from "../../../src/core/desktop/search.ts";
-import { DesktopTimeline } from "../../../src/core/desktop/timeline.ts";
-import { editorFile, saveEditorFile, workspaceView } from "../../../src/core/desktop/workspace.ts";
+import { projectHistory } from "../../../src/core/timeline/history.ts";
+import { DesktopTimeline } from "../../../src/core/timeline/snapshots.ts";
+import { editorFile, workspaceView } from "../../../src/core/workspace/files.ts";
+import { saveEditorFile } from "../../../src/core/workspace/save-file.ts";
+import { searchCode } from "../../../src/core/workspace/search.ts";
 import { DesktopRuntime } from "./offline-runtime.ts";
 
 const execute = promisify(execFile);

@@ -5,10 +5,10 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 import type { Options, Query, SDKMessage, SDKUserMessage } from "@anthropic-ai/claude-agent-sdk";
-import type { OpenInput, RuntimeEvent } from "../../src/core/contracts.ts";
 import { ClaudeAdapter, type ClaudeQuery } from "../../src/core/runtimes/claude/adapter.ts";
 import { CodexAdapter } from "../../src/core/runtimes/codex/adapter.ts";
 import type { CodexTransport, RpcMessage } from "../../src/core/runtimes/codex/transport.ts";
+import type { OpenInput, RuntimeEvent } from "../../src/core/runtimes/types.ts";
 
 function input(backend: "codex" | "claude", workspace = "/project"): OpenInput {
 	return {

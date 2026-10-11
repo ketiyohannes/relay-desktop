@@ -1,0 +1,11 @@
+.themed-select { display: inline-flex; flex-shrink: 0; }
+.select-trigger { display: inline-flex; align-items: center; justify-content: space-between; gap: 14px; padding: 7px 10px; min-width: 110px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; font-size: 12px; }
+.select-trigger .icon { width: 11px; height: 11px; }
+.select-menu { position: fixed; inset: auto; margin: 0; padding: 4px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface); color: var(--ink); box-shadow: 0 4px 14px #00000018; }
+.select-menu:popover-open { display: flex; flex-direction: column; }
+.select-option { display: flex; align-items: center; justify-content: space-between; gap: 20px; text-align: left; border: 0; border-radius: 4px; padding: 8px 10px; font-size: 12px; }
+.select-option[aria-selected='true'] { background: var(--hover); }
+.select-option .icon { visibility: hidden; width: 12px; height: 12px; color: var(--muted); }
+.select-option[aria-selected='true'] .icon { visibility: visible; }
+.routing .select-trigger { border: 0; background: transparent; padding: 5px 6px; min-width: 0; gap: 6px; font-size: 11px; color: var(--muted); }
+.routing .select-trigger:hover { background: var(--hover); }

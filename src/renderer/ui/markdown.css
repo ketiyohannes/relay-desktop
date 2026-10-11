@@ -1,0 +1,16 @@
+.message-body.markdown { white-space: normal; }
+.markdown p { margin: 0 0 12px; }
+.markdown h1, .markdown h2, .markdown h3, .markdown h4 { font-size: 16px; font-weight: 600; margin: 18px 0 10px; white-space: normal; }
+.markdown pre { white-space: pre; overflow: auto; padding: 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }
+.markdown code { font: 13px/1.7 var(--mono); background: var(--hover); padding: 2px 4px; border-radius: 4px; }
+.markdown pre code { background: transparent; padding: 0; }
+.markdown .message-code { max-height: 440px; font-family: var(--mono); }
+.markdown .message-code .code-line { font-size: 13px; }
+.markdown .message-code .code-text { background: transparent; }
+.markdown :is(ul, ol) { padding-left: 22px; }
+.markdown li + li { margin-top: 5px; }
+.markdown > :last-child { margin-bottom: 0; }
+.markdown blockquote { border-left: 2px solid var(--line); margin: 12px 0; padding-left: 14px; color: var(--muted); }
+.markdown a { color: var(--orange); }
+.markdown table { border-collapse: collapse; display: block; overflow: auto; }
+.markdown th, .markdown td { border: 1px solid var(--line); padding: 6px 10px; text-align: left; }

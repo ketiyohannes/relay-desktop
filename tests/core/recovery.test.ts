@@ -3,7 +3,7 @@ import { mkdtemp, realpath, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
-import type { RuntimeAdapter } from "../../src/core/contracts.ts";
+import type { RuntimeAdapter } from "../../src/core/runtimes/types.ts";
 import { RelayApplication } from "../../src/core/service/application.ts";
 
 for (const backend of ["codex", "claude"] as const) {

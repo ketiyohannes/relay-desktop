@@ -1,0 +1,19 @@
+.file-tree details > summary { display: flex; gap: 7px; align-items: center; cursor: pointer; padding: 7px 4px; list-style: none; font: 12px/1.6 var(--mono); }
+.timeline-files.file-tree button { display: flex; align-items: center; gap: 7px; width: 100%; border: 0; text-align: left; padding: 7px 4px; font: 12px/1.6 var(--mono); }
+.timeline-files.file-tree .changed { color: var(--orange); }
+.file-tree details > summary:hover { background: var(--hover); border-radius: 4px; }
+.file-tree details > summary::-webkit-details-marker { display: none; }
+.file-tree details > summary::before { content: '›'; color: var(--muted); }
+.file-tree details[open] > summary::before { transform: rotate(90deg); }
+.tree-children { padding-left: 14px; border-left: 1px solid var(--line); margin-left: 9px; }
+.tree-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+.file-tree button small { color: var(--muted); margin-left: auto; font-size: 10px; }
+.file-tree .icon { flex-shrink: 0; width: 14px; height: 14px; }
+#snapshot-files.file-tree button { display: flex; align-items: center; gap: 6px; }
+.snapshot-tree { display: flex; flex-direction: column; min-height: 0; overflow: hidden; border-right: 1px solid var(--line); }
+.snapshot-tree > input { width: calc(100% - 16px); margin: 8px; font: 12px var(--sans); padding: 8px; }
+#snapshot-files { border-right: 0; flex: 1; }
+.code-actions { padding: 7px 12px; border-bottom: 1px solid var(--line); flex-shrink: 0; flex-wrap: wrap; }
+.code-actions button, .inspector-code-toolbar > button:not(.icon-button) { padding: 5px 7px; font: 12px var(--sans); border: 0; color: var(--muted); }
+.code-actions button:last-child { margin-left: auto; }
+.origin-badge { margin-left: auto; color: var(--orange); font: 10px var(--mono); padding: 0 8px; border: 0; }

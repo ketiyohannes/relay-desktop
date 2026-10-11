@@ -3,18 +3,13 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import type { ExtensionAPI, ExtensionContext, ExtensionUIContext, InputEvent } from "pi-sdk";
 import { type KeybindingsConfig, KeybindingsManager, matchesKey } from "pi-tui";
-import type {
-	AttachmentReference,
-	LedgerData,
-	LedgerEvent,
-	PermissionMode,
-	RelaySession,
-	RuntimeSelection,
-} from "../contracts.ts";
-import { ApprovalPresenter } from "../desktop/approvals.ts";
+import { ApprovalPresenter } from "../permissions/presenter.ts";
+import type { PermissionMode } from "../permissions/types.ts";
+import type { RuntimeSelection } from "../runtimes/types.ts";
 import type { RelayClient } from "../service/client.ts";
 import { imageMediaType } from "../sessions/artifacts.ts";
 import { PublicHistoryRenderer, replayEvents } from "../sessions/public-history.ts";
+import type { AttachmentReference, LedgerData, LedgerEvent, RelaySession } from "../sessions/types.ts";
 import { nativeHistory } from "./sessions.ts";
 
 export const DEFAULT_APP_KEYBINDINGS = {

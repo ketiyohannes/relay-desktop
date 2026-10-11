@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 import { SessionManager, type TerminalInputHandler } from "pi-sdk";
-import type { RuntimeAdapter, RuntimeSelection } from "../../src/core/contracts.ts";
+import type { RuntimeAdapter, RuntimeSelection } from "../../src/core/runtimes/types.ts";
 import { RelayApplication } from "../../src/core/service/application.ts";
 import { RelayServer } from "../../src/core/service/server.ts";
 import { NativeTerminal } from "../../src/core/terminal/native.ts";

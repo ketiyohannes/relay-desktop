@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { AccountUsage, DesktopAccount } from "../../../src/core/desktop/types.ts";
+import type { AccountUsage, DesktopAccount } from "../../../src/core/accounts/types.ts";
 import {
 	AccountUsageService,
 	claudeUsage,
@@ -7,7 +7,7 @@ import {
 	loadAccountUsage,
 	loadClaudeUsage,
 	loadCodexUsage,
-} from "../../../src/core/desktop/usage.ts";
+} from "../../../src/core/accounts/usage.ts";
 
 const account: DesktopAccount = {
 	id: "test",

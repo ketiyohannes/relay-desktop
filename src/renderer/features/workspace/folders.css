@@ -1,0 +1,20 @@
+.file-search { display: flex; align-items: center; gap: 6px; padding: 12px; border-bottom: 1px solid var(--line); }
+.file-search input, #browser-search { min-width: 0; width: 100%; padding: 9px 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
+#project-files { flex: 1; min-height: 0; }
+.finder-button { margin: auto 12px 12px; color: var(--muted); text-align: left; font-size: 13px; }
+.browser-dialog { width: 680px; }
+.browser-path, .input-with-button { display: flex; align-items: center; gap: 8px; }
+.browser-path input, .input-with-button input { min-width: 0; flex: 1; margin: 0; }
+.browser-path { margin-bottom: 12px; }
+#browser-search { margin: 0 0 12px; }
+.browser-entries { height: 340px; overflow: auto; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 8px 0; }
+.browser-entries button { display: flex; gap: 10px; align-items: center; width: 100%; border: 0; text-align: left; padding: 10px; }
+.browser-footer { display: flex; justify-content: space-between; gap: 12px; margin-top: 16px; }
+.profile-shortcuts { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.profile-shortcuts button { font-size: 13px; }
+.profile-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.profile-row > button:first-child { flex: 1; text-align: left; white-space: normal; }
+#load-models { margin-top: 12px; font-size: 13px; }
+#permission-input { max-height: 45vh; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; font: 13px/1.6 var(--mono); }
+.code-line[data-origin] .line-number { cursor: pointer; }
+.review-output { white-space: pre-wrap; font-size: 14px; line-height: 1.7; padding: 12px 0; }

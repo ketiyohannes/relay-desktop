@@ -1,0 +1,15 @@
+.notice { margin: 0 20px 12px; background: var(--error-bg); color: var(--error); border: 1px solid var(--line); border-radius: 5px; padding: 12px; font: 13px/1.5 var(--mono); }
+dialog { color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 24px; width: 530px; max-width: 90vw; max-height: 90vh; }
+dialog::backdrop { background: var(--backdrop); }
+.dialog-heading { display: flex; justify-content: space-between; align-items: start; gap: 15px; }
+.dialog-heading > .auto { margin: 6px 0 0 auto; color: var(--muted); font-size: 12px; }
+.dialog-heading > .auto input { margin: 0; padding: 0; }
+.dialog-heading h2 { font-size: 18px; font-weight: 500; margin: 9px 0 18px; }
+.close-dialog { font-size: 23px; border: 0; padding: 0 6px; }
+dialog p { font-size: 14px; color: var(--muted); line-height: 1.7; }
+dialog form > label, .field-pair label { display: block; font: 12px var(--mono); color: var(--muted); margin-top: 16px; }
+dialog input, dialog select { display: block; width: 100%; padding: 10px; margin-top: 8px; border: 1px solid var(--line); border-radius: 5px; background: var(--surface); color: var(--ink); font: 14px var(--mono); }
+.field-pair { display: flex; gap: 14px; }
+.field-pair > label { flex: 1; min-width: 0; }
+#account-form > .send { margin-top: 24px; float: right; }
+#configured-accounts { font: 12px/1.8 var(--mono); padding: 12px 0; border-bottom: 1px solid var(--line); white-space: pre-line; }

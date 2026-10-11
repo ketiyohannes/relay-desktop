@@ -6,8 +6,8 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { fauxAssistantMessage, fauxProvider, fauxText, fauxThinking, fauxToolCall } from "pi-ai/providers/faux";
 import { ModelRuntime, ProjectTrustStore } from "pi-sdk";
-import type { OpenInput, RuntimeEvent } from "../../src/core/contracts.ts";
 import { PiAdapter } from "../../src/core/runtimes/pi/adapter.ts";
+import type { OpenInput, RuntimeEvent } from "../../src/core/runtimes/types.ts";
 import { ArtifactStore } from "../../src/core/sessions/artifacts.ts";
 
 test("published pi loop writes once, excludes reasoning, and resumes its native journal offline", async () => {

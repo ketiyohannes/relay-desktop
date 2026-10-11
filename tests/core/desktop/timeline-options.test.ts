@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
 import { afterEach, expect, it } from "vitest";
-import { DesktopTimeline } from "../../../src/core/desktop/timeline.ts";
+import { DesktopTimeline } from "../../../src/core/timeline/snapshots.ts";
 import { fakeAccountCatalog } from "./fixtures.ts";
 import { type DesktopEngine, DesktopRuntime } from "./offline-runtime.ts";
 

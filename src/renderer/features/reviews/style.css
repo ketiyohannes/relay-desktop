@@ -1,0 +1,5 @@
+.review-input { display: flex; gap: 12px; align-items: center; }
+#review-text { margin: 8px 0 0; }
+#review-form { padding-top: 16px; }
+.review-input button { white-space: nowrap; margin-top: 8px; }
+.dialog-error { color: var(--error); }

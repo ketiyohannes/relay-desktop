@@ -19,3 +19,19 @@ test("pi adapters use aliases and only published runtime entry points", () => {
 	assert.ok(checkImport(file, "vitest", true).length);
 	assert.ok(checkImport(file, "./contracts.js").length);
 });
+
+test("features use published UI entry points and cannot reach process implementations", () => {
+	const file = resolve("src/renderer/features/conversation/composer.js");
+	assert.deepEqual(checkImport(file, "../settings/index.js", true), []);
+	assert.ok(checkImport(file, "../accounts/model-picker.js", true).length);
+	assert.ok(checkImport(file, "../../../core/service/application.ts", true).length);
+	assert.ok(checkImport(file, "node:fs", true).length);
+	assert.ok(checkImport(file, "electron", true).length);
+	assert.deepEqual(checkImport(resolve("src/renderer/globals.d.ts"), "../core/desktop/types.ts", false, true), []);
+});
+
+test("shared behavior accepts desktop types but cannot call the desktop controller", () => {
+	const file = resolve("src/core/sessions/example.ts");
+	assert.ok(checkImport(file, "../desktop/commands.ts", true).length);
+	assert.deepEqual(checkImport(file, "../desktop/types.ts", false, true), []);
+});

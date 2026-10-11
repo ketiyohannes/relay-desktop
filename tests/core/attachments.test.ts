@@ -4,8 +4,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
-import type { RuntimeAdapter } from "../../src/core/contracts.ts";
 import { PermissionGate } from "../../src/core/permissions/gate.ts";
+import type { RuntimeAdapter } from "../../src/core/runtimes/types.ts";
 import { RelayApplication } from "../../src/core/service/application.ts";
 
 test("attachments survive restart and switching as verified references; public history is scoped readable evidence", async () => {

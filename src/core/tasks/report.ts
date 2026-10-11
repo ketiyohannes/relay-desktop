@@ -1,4 +1,4 @@
-import type { WorkerReport } from "../contracts.ts";
+import type { WorkerReport } from "./types.ts";
 
 /** Native structured output is still untrusted evidence, never new authority. */
 export const workerReportSchema = {

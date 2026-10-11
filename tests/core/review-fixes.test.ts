@@ -6,13 +6,13 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
-import type { LedgerData } from "../../src/core/contracts.ts";
+import { DesktopRuntime } from "../../src/core/desktop/commands.ts";
 import { DesktopRequests } from "../../src/core/desktop/requests.ts";
-import { DesktopRuntime } from "../../src/core/desktop/runtime.ts";
 import { DesktopStore } from "../../src/core/desktop/store.ts";
 import { PermissionGate } from "../../src/core/permissions/gate.ts";
 import { RelayApplication } from "../../src/core/service/application.ts";
 import { SessionLedger } from "../../src/core/sessions/ledger.ts";
+import type { LedgerData } from "../../src/core/sessions/types.ts";
 import { ProcessLock } from "../../src/core/storage/process-lock.ts";
 
 const worker = fileURLToPath(new URL("./fixtures/review-writer.ts", import.meta.url));

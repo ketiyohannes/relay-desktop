@@ -1,0 +1,14 @@
+:root[data-show-usage='false'] :is(#usage-summary, .account-usage, #usage-refresh) { display: none !important; }
+:root[data-show-account='false'] #account-picker { display: none !important; }
+:root[data-effects='false'] *, :root[data-effects='false'] *::before, :root[data-effects='false'] *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; box-shadow: none !important; }
+.setting-row { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 18px 0; border-bottom: 1px solid var(--line); font-size: 14px; cursor: pointer; }
+.setting-row small { display: block; color: var(--muted); font-size: 12px; line-height: 1.6; margin-top: 5px; }
+.setting-row select { width: 110px; flex-shrink: 0; margin: 0; font-family: var(--sans); }
+input[role='switch'] { appearance: none; width: 32px; height: 18px; flex-shrink: 0; padding: 2px; margin: 0; border: 1px solid var(--line); border-radius: 12px; background: var(--hover); cursor: pointer; }
+input[role='switch']::before { content: ''; display: block; width: 12px; height: 12px; border-radius: 50%; background: var(--muted); }
+input[role='switch']:checked { background: var(--ink); border-color: var(--ink); }
+input[role='switch']:checked::before { transform: translateX(14px); background: var(--surface); }
+input[role='switch']:disabled { opacity: .45; cursor: default; }
+.auto input[role='switch'] { width: 28px; height: 16px; padding: 2px; }
+.auto input[role='switch']::before { width: 10px; height: 10px; }
+.auto input[role='switch']:checked::before { transform: translateX(12px); }

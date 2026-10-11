@@ -1,20 +1,10 @@
-import type { RecoveryEntry } from "../contracts.ts";
-import type {
-	AccountCatalog,
-	AccountCatalogs,
-	AccountUsage,
-	CodeSearchResult,
-	DesktopCommand,
-	DesktopLogin,
-	DesktopState,
-	DesktopUpdate,
-	DirectoryView,
-	EditorFile,
-	ExternalSessionPreview,
-	ExternalSessions,
-	ProjectHistory,
-	SnapshotView,
-} from "./types.ts";
+import type { AccountCatalog, AccountCatalogs, AccountUsage, DesktopLogin } from "../accounts/types.ts";
+import type { ExternalSessionPreview, ExternalSessions } from "../imports/types.ts";
+import type { RecoveryEntry } from "../sessions/types.ts";
+import type { ProjectHistory, SnapshotView } from "../timeline/types.ts";
+import type { CodeSearchResult, DirectoryView, EditorFile } from "../workspace/types.ts";
+import type { DesktopCommand } from "./protocol.ts";
+import type { DesktopState, DesktopUpdate } from "./types.ts";
 
 export type DesktopCommandResult<C extends DesktopCommand> = C["type"] extends "browse"
 	? DirectoryView

@@ -2,19 +2,14 @@ import { randomUUID } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { createInterface } from "node:readline";
 import { detectSupportedImageMimeTypeFromFile } from "pi-sdk";
-import type {
-	AttachmentReference,
-	Backend,
-	LedgerEvent,
-	PermissionMode,
-	RelaySession,
-	RuntimeSelection,
-} from "./contracts.ts";
+import type { PermissionMode } from "./permissions/types.ts";
+import type { Backend, RuntimeSelection } from "./runtimes/types.ts";
 import { RelayClient } from "./service/client.ts";
 import { applicationDirectory } from "./service/paths.ts";
 import { type RelayCommand, selection, validateSelection } from "./service/protocol.ts";
 import { imageMediaType } from "./sessions/artifacts.ts";
 import { PublicHistoryRenderer, replayEvents } from "./sessions/public-history.ts";
+import type { AttachmentReference, LedgerEvent, RelaySession } from "./sessions/types.ts";
 
 const args = process.argv.slice(2);
 function option(name: string): string | undefined {

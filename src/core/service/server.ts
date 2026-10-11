@@ -2,7 +2,7 @@ import { randomUUID, timingSafeEqual } from "node:crypto";
 import { chmod, mkdir, rm } from "node:fs/promises";
 import { createServer, type Server, type Socket } from "node:net";
 import { join } from "node:path";
-import type { LedgerEvent } from "../contracts.ts";
+import type { LedgerEvent } from "../sessions/types.ts";
 import { syncDirectory, writePrivateFile } from "../storage/durable.ts";
 import { ProcessLock } from "../storage/process-lock.ts";
 import type { RelayApplication } from "./application.ts";

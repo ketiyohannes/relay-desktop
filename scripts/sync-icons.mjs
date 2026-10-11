@@ -9,4 +9,4 @@ for (const name of names) {
 }
 const source = new URL(import.meta.resolve("@phosphor-icons/core/assets/regular/plus.svg"));
 await writeFile(new URL("LICENSE", target), (await readFile(new URL("../../LICENSE", source), "utf8")).replace(/\r\n/g, "\n"));
-await writeFile(new URL("../src/renderer/icons.css", import.meta.url), `/* Generated from @phosphor-icons/core 2.1.1. Run npm run icons. */\n.icon { display: inline-block; width: 16px; height: 16px; flex-shrink: 0; background: currentColor; mask: var(--icon-url) center / contain no-repeat; }\n${names.map((name) => `.icon-${name} { --icon-url: url('icons/${name}.svg'); }`).join("\n")}\n`);
+await writeFile(new URL("../src/renderer/styles/icons.css", import.meta.url), `/* Generated from @phosphor-icons/core 2.1.1. Run npm run icons. */\n.icon { display: inline-block; width: 16px; height: 16px; flex-shrink: 0; background: currentColor; mask: var(--icon-url) center / contain no-repeat; }\n${names.map((name) => `.icon-${name} { --icon-url: url('../icons/${name}.svg'); }`).join("\n")}\n`);

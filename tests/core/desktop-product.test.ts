@@ -5,10 +5,11 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 import { promisify } from "node:util";
-import { AccountExhaustedError, UncertainExecutionError } from "../../src/core/desktop/engines.ts";
-import { type DesktopEngine, DesktopRuntime } from "../../src/core/desktop/runtime.ts";
+import { DesktopRuntime } from "../../src/core/desktop/commands.ts";
 import { DesktopStore } from "../../src/core/desktop/store.ts";
-import { DesktopTimeline } from "../../src/core/desktop/timeline.ts";
+import type { DesktopEngine } from "../../src/core/sessions/conversation-runner.ts";
+import { AccountExhaustedError, UncertainExecutionError } from "../../src/core/sessions/conversation-types.ts";
+import { DesktopTimeline } from "../../src/core/timeline/snapshots.ts";
 
 const execute = promisify(execFile);
 

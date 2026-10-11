@@ -2,8 +2,8 @@ import { mkdir, mkdtemp, realpath, rm, symlink, writeFile } from "node:fs/promis
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, expect, it, vi } from "vitest";
+import type { DesktopCommand } from "../../../src/core/desktop/protocol.ts";
 import { DesktopStore } from "../../../src/core/desktop/store.ts";
-import type { DesktopCommand } from "../../../src/core/desktop/types.ts";
 import { fakeAccountCatalog } from "./fixtures.ts";
 import { type DesktopEngine, DesktopRuntime } from "./offline-runtime.ts";
 

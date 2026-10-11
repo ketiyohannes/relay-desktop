@@ -1,0 +1,55 @@
+.login-panel { padding: 18px 0; border-bottom: 1px solid var(--line); }
+.login-panel > label { color: var(--muted); font-size: 13px; }
+#login-status:empty { display: none; }
+#login-steps { display: flex; flex-wrap: wrap; gap: 8px; }
+#login-steps p { width: 100%; margin: 4px 0; }
+.login-code { font: 18px var(--mono); letter-spacing: 2px; color: var(--ink); user-select: all; }
+#login-cancel { margin-top: 12px; }
+.existing-profiles { padding-top: 18px; }
+.existing-profiles summary { cursor: pointer; color: var(--muted); }
+.existing-profiles > label { display: block; margin-top: 16px; color: var(--muted); font-size: 13px; }
+.existing-profiles > .send { margin-top: 16px; }
+.dialog-heading p { margin: 0 0 18px; }
+.account-tabs { display: flex; gap: 20px; border-bottom: 1px solid var(--line); margin-bottom: 18px; }
+.account-tabs button { border: 0; border-radius: 0; padding: 10px 0; color: var(--muted); border-bottom: 2px solid transparent; }
+.account-tabs button[aria-selected='true'] { color: var(--ink); border-bottom-color: var(--ink); }
+.provider-options { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 20px 0 12px; }
+.provider-options article { padding: 18px; border: 1px solid var(--line); border-radius: 10px; }
+.provider-options h3 { font-size: 16px; margin: 0; font-weight: 600; }
+.provider-options p { font-size: 13px; margin: 8px 0 18px; }
+.provider-options button { width: 100%; font-size: 13px; }
+.text-button { border: 0; color: var(--muted); margin-top: 8px; }
+.login-panel { padding: 4px 0; border: 0; }
+#signup-status { font-size: 13px; }
+#configured-accounts { border: 0; padding: 0; font-family: var(--sans); white-space: normal; }
+.connected-account { border: 1px solid var(--line); border-radius: 10px; padding: 16px; margin-bottom: 12px; }
+.connected-heading { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.connected-heading strong { font-size: 14px; font-weight: 600; }
+.connected-heading small { display: block; color: var(--muted); margin-top: 4px; overflow-wrap: anywhere; }
+.connection-status { font-size: 12px; color: var(--muted); white-space: nowrap; }
+.account-row-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.account-row-controls button { font-size: 12px; padding: 6px 9px; }
+.account-row-controls button:has(.icon) { margin-left: auto; }
+.account-row-controls .move-account-down { margin-left: 0 !important; }
+.move-account-down .icon { transform: rotate(180deg); }
+.account-identity { margin: 8px 0 0; font-size: 12px; }
+#account-view-profile .existing-profiles { padding: 0; }
+#account-view-profile .existing-profiles > summary { display: none; }
+#account-form::after { content: ''; display: block; clear: both; }
+#model-picker { display: inline-flex; gap: 6px; align-items: center; padding: 5px 7px; border: 0; max-width: 220px; font-size: 13px; }
+#current-model { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#model-picker > .icon { width: 12px; height: 12px; transform: rotate(90deg); flex-shrink: 0; }
+.routing .auto { font-size: 11px; margin-left: 4px; }
+#model-dialog { width: 570px; }
+#model-dialog h2 { margin-bottom: 8px; }
+#model-account { margin: 0; }
+#model-search { font-family: var(--sans); margin-top: 14px; }
+#model-options { max-height: 44vh; overflow: auto; }
+.model-account-group + .model-account-group { border-top: 1px solid var(--line); margin-top: 12px; }
+.model-account-group h3 { font-size: 12px; font-weight: 500; color: var(--muted); margin: 16px 12px 8px; }
+.model-account-status { margin: 8px 12px; font-size: 12px; }
+.model-option { display: flex; align-items: center; justify-content: space-between; gap: 16px; width: 100%; text-align: left; padding: 12px; border: 1px solid transparent; margin-bottom: 4px; }
+.model-option.selected { background: var(--hover); border-color: var(--line); }
+.model-option strong { font-size: 14px; font-weight: 500; }
+.model-option small { display: block; margin-top: 5px; color: var(--muted); line-height: 1.5; overflow-wrap: anywhere; }
+.model-option .icon { flex-shrink: 0; color: var(--muted); }

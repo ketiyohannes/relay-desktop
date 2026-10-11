@@ -1,0 +1,5 @@
+.composer-footer { align-items: flex-end; }
+.conversation-work > summary > span:not(.icon) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.conversation-work > summary > small { white-space: nowrap; }
+.work-note { font: 12px/1.7 var(--sans); color: var(--muted); padding: 8px 0; }
+@media (max-width: 900px) { .settings-layout { grid-template-columns: 135px minmax(0, 1fr); } .settings-content { padding: 22px; } }

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { installWorkspaceTools } from '../../src/renderer/workspace-tools.js';
+import { installWorkspaceTools } from '../../src/renderer/features/workspace/index.js';
 
 class Element {
   value = ''; textContent = ''; hidden = false; disabled = false; open = false; children = []; callbacks = new Map();

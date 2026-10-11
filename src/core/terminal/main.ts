@@ -24,10 +24,11 @@ import {
 	SettingsManager,
 	VERSION,
 } from "pi-sdk";
-import type { PermissionMode, RelaySession } from "../contracts.ts";
+import type { PermissionMode } from "../permissions/types.ts";
 import { noTrustUI, resolveTrust } from "../runtimes/pi/trust.ts";
 import { RelayClient } from "../service/client.ts";
 import { applicationDirectory } from "../service/paths.ts";
+import type { RelaySession } from "../sessions/types.ts";
 import { terminalHost } from "./host.ts";
 import { TerminalSessions } from "./sessions.ts";
 

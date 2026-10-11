@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { modelGroups } from '../../src/renderer/model-options.js';
+import { modelGroups } from '../../src/renderer/features/accounts/model-options.js';
 
 const accounts = [
   { id: 'codex-a', name: 'Work', engine: 'pi', provider: 'openai-codex', model: 'gpt' },

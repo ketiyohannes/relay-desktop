@@ -3,12 +3,15 @@ import { mkdir, mkdtemp, realpath, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
-import type { LedgerEvent, RuntimeAdapter } from "../../src/core/contracts.ts";
-import { ApprovalPresenter } from "../../src/core/desktop/approvals.ts";
-import { accountSelection, DesktopEngineBridge, projectEvents, publicHistory } from "../../src/core/desktop/engines.ts";
+import { accountSelection } from "../../src/core/accounts/selection.ts";
+import { DesktopEngineBridge } from "../../src/core/desktop/service-connection.ts";
 import type { DesktopSession, DesktopState } from "../../src/core/desktop/types.ts";
+import { ApprovalPresenter } from "../../src/core/permissions/presenter.ts";
+import type { RuntimeAdapter } from "../../src/core/runtimes/types.ts";
 import { RelayApplication } from "../../src/core/service/application.ts";
 import { RelayServer } from "../../src/core/service/server.ts";
+import { projectEvents, publicHistory } from "../../src/core/sessions/desktop-projection.ts";
+import type { LedgerEvent } from "../../src/core/sessions/types.ts";
 
 test("desktop projects task results once and exposes uncertain execution without worker transcript takeover", () => {
 	const session: DesktopSession = {

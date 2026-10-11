@@ -1,4 +1,4 @@
-import type { LedgerEvent, RelaySession } from "../contracts.ts";
+import type { LedgerEvent, RelaySession } from "./types.ts";
 
 /** Replay public observations only. Completed text replaces its streamed deltas. */
 export function replayEvents(session: RelaySession, raw = false): LedgerEvent[] {

@@ -1,15 +1,10 @@
 import { randomUUID } from "node:crypto";
 import type { SessionManager, SessionStartEvent } from "pi-sdk";
-import type {
-	ArtifactReference,
-	AttachmentReference,
-	Handoff,
-	LedgerData,
-	RelaySession,
-	RuntimeSelection,
-} from "../contracts.ts";
+import type { Handoff } from "../handoffs/types.ts";
+import type { RuntimeSelection } from "../runtimes/types.ts";
 import type { RelayClient } from "../service/client.ts";
 import { imageMediaType } from "../sessions/artifacts.ts";
+import type { ArtifactReference, AttachmentReference, LedgerData, RelaySession } from "../sessions/types.ts";
 
 type NativeManager = Pick<SessionManager, "getSessionId" | "getCwd" | "getSessionName" | "getBranch" | "getLeafId">;
 

@@ -12,6 +12,9 @@ import {
 	SettingsManager,
 } from "pi-sdk";
 import { Type } from "typebox";
+import { attachmentImages, attachmentText } from "../../handoffs/attachments.ts";
+import { turnText } from "../../handoffs/context.ts";
+import { PermissionGate } from "../../permissions/gate.ts";
 import type {
 	Capability,
 	OpenInput,
@@ -20,10 +23,7 @@ import type {
 	RuntimeEvent,
 	RuntimeSelection,
 	TurnInput,
-} from "../../contracts.ts";
-import { attachmentImages, attachmentText } from "../../handoffs/attachments.ts";
-import { turnText } from "../../handoffs/context.ts";
-import { PermissionGate } from "../../permissions/gate.ts";
+} from "../types.ts";
 import { noTrustUI, resolveTrust } from "./trust.ts";
 
 export class PiAdapter implements RuntimeAdapter {

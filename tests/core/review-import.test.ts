@@ -3,8 +3,8 @@ import { mkdtemp, realpath, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
-import { publicHistory } from "../../src/core/desktop/engines.ts";
-import { DesktopSessionImporter } from "../../src/core/desktop/session-import.ts";
+import { DesktopSessionImporter } from "../../src/core/imports/discovery.ts";
+import { publicHistory } from "../../src/core/sessions/desktop-projection.ts";
 
 for (const [label, metadata, output, orphan, expected] of [
 	["structured success", { exit_code: 0 }, "successful", false, "done"],

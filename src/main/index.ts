@@ -2,8 +2,10 @@ import { type ChildProcess, fork } from "node:child_process";
 import { realpath } from "node:fs/promises";
 import { delimiter, dirname, join } from "node:path";
 import { app, BrowserWindow, ipcMain, shell } from "electron";
+import type { DesktopLogin } from "../core/accounts/types.ts";
+import type { DesktopCommand } from "../core/desktop/protocol.ts";
 import { DesktopRequests } from "../core/desktop/requests.ts";
-import type { DesktopCommand, DesktopLogin, DesktopState, DesktopUpdate } from "../core/desktop/types.ts";
+import type { DesktopState, DesktopUpdate } from "../core/desktop/types.ts";
 import { applicationDirectory } from "../core/service/paths.ts";
 
 const root = app.isPackaged ? app.getAppPath() : process.env.RELAY_REPOSITORY;

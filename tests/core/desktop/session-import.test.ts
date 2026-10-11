@@ -3,11 +3,12 @@ import { mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promis
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, expect, it, vi } from "vitest";
-import type { Handoff } from "../../../src/core/contracts.ts";
-import { publicHistory } from "../../../src/core/desktop/engines.ts";
-import { DesktopSessionImporter, sessionChatText } from "../../../src/core/desktop/session-import.ts";
 import { DesktopStore } from "../../../src/core/desktop/store.ts";
 import { turnText } from "../../../src/core/handoffs/context.ts";
+import type { Handoff } from "../../../src/core/handoffs/types.ts";
+import { DesktopSessionImporter } from "../../../src/core/imports/discovery.ts";
+import { sessionChatText } from "../../../src/core/imports/presentation.ts";
+import { publicHistory } from "../../../src/core/sessions/desktop-projection.ts";
 import { fakeAccountCatalog } from "./fixtures.ts";
 import { DesktopRuntime } from "./offline-runtime.ts";
 

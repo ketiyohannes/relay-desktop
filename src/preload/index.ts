@@ -1,6 +1,8 @@
 import { contextBridge, ipcRenderer } from "electron";
+import type { DesktopLogin } from "../core/accounts/types.ts";
 import type { DesktopBridge, DesktopCommandResult } from "../core/desktop/bridge.ts";
-import type { DesktopCommand, DesktopLogin, DesktopState, DesktopUpdate } from "../core/desktop/types.ts";
+import type { DesktopCommand } from "../core/desktop/protocol.ts";
+import type { DesktopState, DesktopUpdate } from "../core/desktop/types.ts";
 
 contextBridge.exposeInMainWorld("relay", {
 	onLogin: (callback: (state: DesktopLogin) => void) => {

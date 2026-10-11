@@ -1,0 +1,26 @@
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+* { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+.code-panel { min-width: 0; display: flex; flex-direction: column; background: var(--paper); }
+.code-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 9px 12px; border-bottom: 1px solid var(--line); font: 12px var(--mono); gap: 10px; }
+#file-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.code-toolbar select { width: auto; padding: 4px; margin: 0; font-size: 12px; }
+#file-content { margin: 0; padding: 14px; overflow: auto; font: 13px/1.7 var(--mono); flex: 1; }
+.code-line { display: block; }
+.line-number { display: inline-block; width: 45px; color: var(--muted); user-select: none; }
+.code-view { tab-size: 4; }
+.code-view:has(.code-line) { padding: 10px 0 !important; }
+.code-view .code-line { display: flex; width: max-content; min-width: 100%; min-height: 23px; padding-right: 16px; font: 13px/23px var(--mono); }
+.code-view .line-number { width: 4ch; flex: 0 0 4ch; text-align: right; margin-right: 12px; font-size: 11px; opacity: .8; }
+.code-view .code-text { white-space: pre; padding-right: 12px; }
+.code-view .added { background: var(--diff-add); }
+.code-view .removed { background: var(--diff-remove); }
+.diff-marker { width: 2ch; flex: 0 0 2ch; user-select: none; }
+.added .diff-marker { color: var(--diff-add-ink); }
+.removed .diff-marker { color: var(--diff-remove-ink); }
+.code-view .gap, .code-view .note { padding: 5px 14px; background: var(--hover); color: var(--muted); font: 11px/20px var(--sans); }
+.code-view .note { background: transparent; font-style: italic; }
+.hljs-keyword, .hljs-selector-tag, .hljs-built_in, .hljs-tag { color: var(--code-keyword); }
+.hljs-string, .hljs-regexp, .hljs-template-tag { color: var(--code-string); }
+.hljs-number, .hljs-literal, .hljs-attr, .hljs-variable, .hljs-symbol { color: var(--code-number); }
+.hljs-title, .hljs-type, .hljs-section, .hljs-attribute { color: var(--code-title); }
+.hljs-comment, .hljs-quote, .hljs-meta { color: var(--code-comment); }

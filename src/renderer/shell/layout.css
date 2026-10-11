@@ -1,0 +1,25 @@
+.shellbar { height: 52px; display: flex; align-items: center; border-bottom: 1px solid var(--line); -webkit-app-region: drag; background: var(--panel); }
+.shell-brand { width: max(180px, var(--sidebar-width)); padding-left: 90px; flex-shrink: 0; height: 100%; display: flex; align-items: center; background: var(--paper); border-right: 1px solid var(--line); }
+.brand { font-family: var(--display); font-size: 15px; letter-spacing: -.3px; font-weight: 500; white-space: nowrap; }
+.brand span { color: var(--muted); font-weight: 400; }
+.shell-controls { display: flex; align-items: center; gap: 12px; padding: 0 16px; width: 100%; }
+#connection { margin-left: auto; }
+.icon-button { width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; padding: 0; border: 0; color: var(--muted); }
+.shellbar button { -webkit-app-region: no-drag; }
+#connection { font: 12px var(--mono); color: var(--muted); display: flex; gap: 8px; align-items: center; }
+#theme-toggle { width: 28px; height: 28px; }
+.icon.theme-sun, [data-theme='dark'] .theme-moon { display: none; }
+[data-theme='dark'] .theme-sun { display: block; }
+.led { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+.workspace { display: grid; grid-template-columns: var(--sidebar-width) var(--left-rail, 4px) minmax(410px, 1fr) var(--right-rail, 4px) var(--details-width); grid-template-rows: minmax(0, 1fr); height: calc(100vh - 52px); }
+.navigation { grid-column: 1; }
+#left-resize { grid-column: 2; }
+.conversation { grid-column: 3; }
+#right-resize { grid-column: 4; }
+.inspector { grid-column: 5; }
+.resize-handle { cursor: col-resize; background: var(--line); touch-action: none; position: relative; }
+.resize-handle::after { content: ''; position: absolute; inset: 0 -3px; z-index: 2; }
+.resize-handle:hover, .resize-handle:focus-visible { background: var(--orange); outline: none; }
+.resizing { cursor: col-resize; user-select: none; }
+[hidden] { display: none !important; }
+.navigation, .conversation, .timeline, .messages, .projects, .actions, .code-panel { min-height: 0; }

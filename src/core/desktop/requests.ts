@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import type { DesktopCommand } from "./types.ts";
+import type { DesktopCommand } from "./protocol.ts";
 
 const queries = new Set<DesktopCommand["type"]>([
 	"state",

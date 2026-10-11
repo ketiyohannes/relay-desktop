@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import type { Approval } from "../../src/core/contracts.ts";
-import { ApprovalPresenter } from "../../src/core/desktop/approvals.ts";
+import { ApprovalPresenter } from "../../src/core/permissions/presenter.ts";
+import type { Approval } from "../../src/core/permissions/types.ts";
 
 test("snapshot approval recovery is independent of cursor and closes on external settlement", async () => {
 	let presentations = 0;

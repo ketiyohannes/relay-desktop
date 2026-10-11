@@ -8,6 +8,11 @@ import {
 	type SDKMessage,
 	type SDKUserMessage,
 } from "@anthropic-ai/claude-agent-sdk";
+import { attachmentImages, attachmentText } from "../../handoffs/attachments.ts";
+import { turnText } from "../../handoffs/context.ts";
+import { PermissionGate } from "../../permissions/gate.ts";
+import { workerReport, workerReportSchema } from "../../tasks/report.ts";
+import { stopProcessGroup } from "../process-group.ts";
 import type {
 	Capability,
 	OpenInput,
@@ -16,12 +21,7 @@ import type {
 	RuntimeEvent,
 	RuntimeSelection,
 	TurnInput,
-} from "../../contracts.ts";
-import { attachmentImages, attachmentText } from "../../handoffs/attachments.ts";
-import { turnText } from "../../handoffs/context.ts";
-import { PermissionGate } from "../../permissions/gate.ts";
-import { workerReport, workerReportSchema } from "../../tasks/report.ts";
-import { stopProcessGroup } from "../process-group.ts";
+} from "../types.ts";
 
 export type ClaudeQuery = (input: { prompt: AsyncIterable<SDKUserMessage>; options: Options }) => Query;
 

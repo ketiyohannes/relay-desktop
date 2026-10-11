@@ -1,0 +1,12 @@
+.action:has(.timeline-preview):hover { background: transparent; }
+.timeline-files { padding: 0 4px; }
+.timeline-file { border: 0; width: 100%; display: flex; gap: 7px; align-items: center; text-align: left; padding: 8px 0; font: 12px var(--mono); }
+.timeline-file > span:nth-child(2) { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.timeline-file > .icon { color: var(--muted); width: 13px; height: 13px; flex-shrink: 0; }
+.timeline-preview { margin: 3px 0 0; max-height: 300px; overflow: auto; border: 1px solid var(--line); border-radius: 5px; font: 12px/1.7 var(--mono); }
+.timeline-preview .code-line { font-size: 12px; }
+.timeline-preview .line-number { width: 3ch; flex-basis: 3ch; margin-right: 7px; }
+.timeline-review { border: 0; padding: 9px 4px 14px; font-size: 12px; color: var(--muted); }
+.action-raw { margin: 0 8px 12px 27px; font-size: 12px; color: var(--muted); }
+.action-raw summary { cursor: pointer; }
+.action-raw pre { max-height: 240px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; font: 12px/1.7 var(--mono); }

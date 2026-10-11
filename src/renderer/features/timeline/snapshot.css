@@ -1,0 +1,8 @@
+.snapshot-dialog { width: 1100px; height: 85vh; }
+.snapshot-dialog[open] { display: flex; flex-direction: column; overflow: hidden; }
+.snapshot-dialog > .dialog-heading, .snapshot-dialog > #review-form { flex-shrink: 0; }
+.snapshot-body { min-height: 0; flex: 1; display: grid; grid-template-columns: 230px minmax(0, 1fr); border: 1px solid var(--line); }
+#snapshot-files { overflow: auto; border-right: 1px solid var(--line); padding: 10px; }
+#snapshot-files button { display: block; border: 0; width: 100%; text-align: left; font: 12px/1.5 var(--mono); overflow-wrap: anywhere; padding: 7px; }
+#snapshot-files .changed { color: var(--orange); }
+#snapshot-files .selected { background: var(--hover); }

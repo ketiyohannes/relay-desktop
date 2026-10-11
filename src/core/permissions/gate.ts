@@ -1,7 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { realpath } from "node:fs/promises";
 import { isAbsolute, relative, resolve, sep } from "node:path";
-import type { PermissionMode, RuntimeEvent } from "../contracts.ts";
+import type { RuntimeEvent } from "../runtimes/types.ts";
+import type { PermissionMode } from "./types.ts";
 
 const reads = new Set(["read", "grep", "find", "ls", "Read", "Grep", "Glob"]);
 const edits = new Set(["write", "edit", "Write", "Edit", "NotebookEdit"]);

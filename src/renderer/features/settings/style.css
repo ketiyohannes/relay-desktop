@@ -1,0 +1,17 @@
+.settings-dialog { width: min(920px, 92vw); height: min(740px, 88vh); padding: 0; }
+.settings-dialog[open] { display: flex; flex-direction: column; overflow: hidden; }
+.settings-heading { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; border-bottom: 1px solid var(--line); flex-shrink: 0; }
+.settings-heading h2 { font-size: 15px; font-weight: 500; margin: 0; }
+.settings-layout { display: grid; grid-template-columns: 170px minmax(0, 1fr); min-height: 0; flex: 1; }
+.settings-nav { display: flex; flex-direction: column; gap: 3px; padding: 16px 10px; background: var(--paper); border-right: 1px solid var(--line); }
+.settings-nav button { text-align: left; border: 0; border-radius: 5px; padding: 9px 12px; color: var(--muted); font-size: 13px; }
+.settings-nav button[aria-selected='true'] { background: var(--hover); color: var(--ink); }
+.settings-nav small { margin-top: auto; padding: 12px; font-size: 10px; color: var(--muted); }
+.settings-content { overflow: auto; padding: 28px 32px; min-width: 0; }
+.settings-content h3 { margin: 0 0 6px; font-size: 16px; font-weight: 500; }
+.settings-content .settings-description { margin: 0 0 18px; font-size: 12px; }
+.settings-content .setting-row { padding: 16px 0; font-size: 13px; }
+.setting-placeholder { cursor: default; color: var(--muted); }
+.coming-soon { font-size: 10px; white-space: nowrap; color: var(--muted); }
+.settings-content .setting-row small { font-size: 11px; }
+.settings-dialog > .dialog-error { margin: 0; padding: 12px 24px; border-top: 1px solid var(--line); flex-shrink: 0; }

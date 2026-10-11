@@ -2,19 +2,15 @@ import { randomUUID } from "node:crypto";
 import type { ImageContent } from "pi-ai";
 import { createLocalBashOperations, type ExtensionContext, type ExtensionFactory } from "pi-sdk";
 import { Type } from "typebox";
-import type {
-	AttachmentReference,
-	DelegationResult,
-	PermissionMode,
-	RelaySession,
-	RuntimeEvent,
-	TurnInput,
-} from "../contracts.ts";
-import { ApprovalPresenter } from "../desktop/approvals.ts";
 import { turnText } from "../handoffs/context.ts";
 import { PermissionGate } from "../permissions/gate.ts";
+import { ApprovalPresenter } from "../permissions/presenter.ts";
+import type { PermissionMode } from "../permissions/types.ts";
+import type { RuntimeEvent, TurnInput } from "../runtimes/types.ts";
 import type { RelayClient } from "../service/client.ts";
 import { imageMediaType } from "../sessions/artifacts.ts";
+import type { AttachmentReference, RelaySession } from "../sessions/types.ts";
+import type { DelegationResult } from "../tasks/types.ts";
 import { NativeTerminal } from "./native.ts";
 
 /** Only public lifecycle hooks; published pi owns prompts, tools, compaction, and UI. */

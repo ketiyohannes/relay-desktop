@@ -1,0 +1,14 @@
+.actions { flex: 1; overflow: auto; }
+.action { position: relative; display: flex; align-items: start; gap: 3px; border-radius: 5px; }
+.action:hover { background: var(--hover); }
+.action-details { min-width: 0; flex: 1; }
+.action-details > summary { display: flex; align-items: center; gap: 8px; padding: 10px 6px; cursor: pointer; list-style: none; }
+.action-details > summary::-webkit-details-marker { display: none; }
+.action-details > summary .icon { width: 13px; height: 13px; color: var(--muted); }
+.action-title { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+.action-time { font: 11px var(--mono); color: var(--muted); flex-shrink: 0; }
+.action-inspect { width: 24px; height: 28px; margin-top: 4px; opacity: .5; }
+.action:hover .action-inspect, .action:focus-within .action-inspect { opacity: 1; }
+.action-inspect .icon { width: 13px; height: 13px; }
+.action-description, .action-files { font: 12px/1.8 var(--mono); color: var(--muted); padding: 0 6px 10px 27px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.empty-timeline { padding-top: 10px; font: 13px/1.8 var(--mono); color: var(--muted); white-space: pre-line; }

@@ -1,16 +1,7 @@
-import type {
-	ArtifactReference,
-	AttachmentReference,
-	Backend,
-	DelegationRequest,
-	ExecutionStatus,
-	LedgerData,
-	McpServer,
-	PermissionMode,
-	ProductNote,
-	RuntimeEvent,
-	RuntimeSelection,
-} from "../contracts.ts";
+import type { PermissionMode } from "../permissions/types.ts";
+import type { Backend, ExecutionStatus, McpServer, RuntimeEvent, RuntimeSelection } from "../runtimes/types.ts";
+import type { ArtifactReference, AttachmentReference, LedgerData, ProductNote } from "../sessions/types.ts";
+import type { DelegationRequest } from "../tasks/types.ts";
 
 export type RelayCommand =
 	| { type: "hello" }

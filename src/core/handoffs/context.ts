@@ -1,5 +1,7 @@
 import { randomUUID } from "node:crypto";
-import type { Handoff, NativeRecord, RelaySession } from "../contracts.ts";
+import type { NativeRecord } from "../runtimes/types.ts";
+import type { RelaySession } from "../sessions/types.ts";
+import type { Handoff } from "./types.ts";
 
 /** Deterministic selection of public evidence, with an explicit omission count. */
 export function prepareHandoff(

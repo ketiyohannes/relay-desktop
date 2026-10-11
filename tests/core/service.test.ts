@@ -4,7 +4,7 @@ import { connect } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
-import type { RuntimeAdapter } from "../../src/core/contracts.ts";
+import type { RuntimeAdapter } from "../../src/core/runtimes/types.ts";
 import { RelayApplication } from "../../src/core/service/application.ts";
 import { RelayClient } from "../../src/core/service/client.ts";
 import { socketPath } from "../../src/core/service/paths.ts";

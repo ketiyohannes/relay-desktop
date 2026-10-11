@@ -1,6 +1,7 @@
 # Dependencies and generated app output
 node_modules/
 dist/
+/output/
 .runtime/
 coverage/
 *.tsbuildinfo

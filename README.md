@@ -10,21 +10,34 @@ account selection, approvals, and recovery. Each backend owns its agent loop and
 src/
   main/                 Electron window, OS integration, and application worker
   preload/              Restricted IPC bridge exposed to the renderer
-  renderer/             Browser UI, styles, and local icon assets
+  renderer/
+    app.js              Connects state, bridge events, and built-in features
+    features/           Accounts, conversation, imports, permissions, reviews,
+                        sessions, settings, timeline, and workspace UI
+    shell/              Panel layout, resizing, notices, and responsive styles
+    ui/                 Shared DOM, Markdown, code, tree, and select controls
+    styles/             Theme and base styles; feature CSS lives with its UI
+    icons/              Local icon assets
   core/
-    service/            Local application service, client, protocol, and recovery
-    sessions/           Durable public ledger and verified attachments
+    service/            Application coordination, socket server/client, protocol
+    sessions/           Public ledger, execution, recovery, conversation runner,
+                        session commands, projections, and verified attachments
     runtimes/           Codex, Claude, and pi adapters
-    desktop/            Account catalog, imports, timeline, editing, UI projections
-    permissions/        Tool approval policy
+    desktop/            Command routing, shared-service connection, persistence,
+                        state projection, and incremental UI updates
+    permissions/        Tool policy, approval lifecycle, and approval presentation
     handoffs/           Bounded public context transferred between runtimes
     resources/          Workspace and configured resource ownership
     storage/            Durable file writes
-    accounts/           Credential-reading helpers
-    tasks/              Delegated task reports
+    accounts/           Profiles, catalogs, login, usage, selection, and credentials
+    imports/            Native session discovery, public transcript import
+    timeline/           Snapshots, history, change filtering, and queries
+    workspace/          Browsing, search, file reads, and durable editor saves
+    reviews/            Snapshot review context and isolated review environment
+    tasks/              Delegation, worker configuration, and task reports
     terminal/           Published pi terminal integration
     cli.ts              Relay CLI and JSONL RPC entry
-    contracts.ts        Shared application contracts
+    contracts.ts        Public type exports; definitions live with their owners
 tests/
   core/                 Offline service, runtime, and product tests
   renderer/             UI state, model grouping, and diff tests
@@ -39,6 +52,14 @@ release target. The source folders still enforce process and product boundaries:
 `core` cannot import Electron or the frontend, and the renderer talks through preload IPC.
 The worker connects to a local service so desktop, CLI, and terminal share durable sessions.
 The renderer receives account metadata; credentials remain in provider profiles.
+
+Features are built-in modules with explicit dependencies. A workspace save, for
+example, goes from the renderer editor through preload IPC to the desktop router,
+then to workspace code; it does not require changing account or import code.
+Each module owns its timers, caches, and request state. Entry files connect modules
+through named callbacks and typed interfaces. The checks enforce core/process
+separation and require UI features to use another feature's entry point.
+See [ARCHITECTURE.md](ARCHITECTURE.md) for file responsibilities and extension rules.
 
 There is no vendored pi agent, provider library, or terminal implementation. The pi
 adapter uses exact-pinned `pi-sdk`, `pi-ai`, and `pi-tui` npm aliases and their public exports.

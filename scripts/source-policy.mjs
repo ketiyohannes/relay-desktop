@@ -1,25 +1,38 @@
 import { existsSync, readFileSync } from "node:fs";
 import { isBuiltin } from "node:module";
-import { dirname, resolve, sep } from "node:path";
+import { basename, dirname, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const core = resolve(root, "src/core") + sep;
+const desktop = resolve(core, "desktop") + sep;
+const renderer = resolve(root, "src/renderer") + sep;
+const features = resolve(renderer, "features") + sep;
 const manifest = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
 const pi = new Map(["pi-sdk", "pi-ai", "pi-tui"].map((name) => [name,
 	JSON.parse(readFileSync(resolve(root, "node_modules", name, "package.json"), "utf8")),
 ]));
 
 /** Keep product code independent of Electron and imports inside public package exports. */
-export function checkImport(file, specifier, runtime = false) {
+export function checkImport(file, specifier, runtime = false, typeOnly = false) {
 	const failures = [];
 	if (specifier.startsWith(".")) {
 		const target = resolve(dirname(file), specifier);
 		if (file.startsWith(core) && !target.startsWith(core)) failures.push(`core imports outside core: ${specifier}`);
+		if (file.startsWith(core) && !file.startsWith(desktop) && target.startsWith(desktop) && !typeOnly)
+			failures.push(`shared behavior cannot import desktop implementation: ${specifier}`);
+		if (file.startsWith(renderer) && !target.startsWith(renderer) && !typeOnly)
+			failures.push(`renderer cannot import process or core implementation: ${specifier}`);
+		if (file.startsWith(features) && target.startsWith(features) &&
+			file.slice(features.length).split(sep)[0] !== target.slice(features.length).split(sep)[0] &&
+			!typeOnly && basename(target) !== "index.js")
+			failures.push(`use the other feature's entry point: ${specifier}`);
 		if (file.endsWith(".ts") && !specifier.endsWith(".ts")) failures.push(`TypeScript relative imports must end in .ts: ${specifier}`);
 		if (!existsSync(target)) failures.push(`missing local module: ${specifier}`);
 		return failures;
 	}
+	if (file.startsWith(renderer) && (isBuiltin(specifier) || specifier === "electron") && !typeOnly)
+		failures.push(`renderer cannot import Node or Electron: ${specifier}`);
 	if (isBuiltin(specifier)) return failures;
 	if (specifier.startsWith("@earendil-works/pi-") || specifier.startsWith("@relay/") || specifier.includes("node_modules/") || specifier.startsWith("/"))
 		failures.push(`use local modules or published npm aliases: ${specifier}`);

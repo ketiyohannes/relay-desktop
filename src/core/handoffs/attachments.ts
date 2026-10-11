@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
-import type { ImageMediaType, RuntimeAttachment } from "../contracts.ts";
+import type { RuntimeAttachment } from "../runtimes/types.ts";
 import { imageMediaType } from "../sessions/artifacts.ts";
+import type { ImageMediaType } from "../sessions/types.ts";
 
 /** A typed public image block, separate from provider-specific message envelopes. */
 export async function attachmentImages(

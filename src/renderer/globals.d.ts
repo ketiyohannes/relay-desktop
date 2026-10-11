@@ -1,15 +1,20 @@
 import type { DesktopBridge, DesktopCommandResult as CommandResult } from "../core/desktop/bridge.ts";
 import type {
+	AccountCatalog as Catalog,
 	DesktopAccount as Account,
+	DesktopLogin as Login,
+} from "../core/accounts/types.ts";
+import type {
 	DesktopState as State,
-	DesktopCommand as Command,
 	DesktopSession as Session,
 	DesktopAction as Action,
-	DesktopLogin as Login,
 } from "../core/desktop/types.ts";
+import type { DesktopCommand as Command } from "../core/desktop/protocol.ts";
 import type * as DiffLibrary from "diff";
 import type * as MarkdownLibrary from "marked";
 declare global {
+	type AccountCatalog = Catalog;
+	type RendererCommand = <C extends Command>(command: C, options?: { silent?: boolean }) => Promise<CommandResult<C>>;
 	type DesktopAccount = Account;
 	type DesktopState = State;
 	type DesktopCommand = Command;
@@ -27,6 +32,16 @@ declare global {
 		highlight(text: string, options: { language: string; ignoreIllegals: boolean }): { value: string };
 	};
 	type WorkspaceSelection = { sessionId: string; actionId?: string; path?: string };
+	interface WorkspaceController {
+		openSearch(selection: WorkspaceSelection, scope: string): void;
+		openEditor(selection: WorkspaceSelection): void;
+		actions: Map<string, Action>;
+		refreshHistory(force?: boolean): Promise<void>;
+		renderTimelineStatus(): void;
+		timelineEnabled(): boolean;
+		editorStatus(refreshOnly?: boolean): void;
+		updateNavigation(): void;
+	}
 	interface WorkspaceToolsApi {
 		command<C extends Command>(command: C, options?: { silent?: boolean }): Promise<CommandResult<C>>;
 		active(): Session | undefined;

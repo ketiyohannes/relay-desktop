@@ -1,7 +1,7 @@
 import { Type } from "typebox";
 import { Check } from "typebox/value";
-import type { LedgerEvent } from "../contracts.ts";
 import { validateSelection } from "../service/protocol.ts";
+import type { LedgerEvent } from "./types.ts";
 
 const text = Type.String({ pattern: "^[^\\u0000]*$" });
 const id = Type.String({ minLength: 1, maxLength: 512, pattern: "^[^\\u0000]*$" });

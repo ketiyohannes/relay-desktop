@@ -7,8 +7,8 @@ import {
 	DesktopLoginManager,
 	type LoginProvider,
 	loginProvider,
-} from "../../../src/core/desktop/login.ts";
-import type { DesktopAccount, DesktopLogin } from "../../../src/core/desktop/types.ts";
+} from "../../../src/core/accounts/login.ts";
+import type { DesktopAccount, DesktopLogin } from "../../../src/core/accounts/types.ts";
 
 const directories: string[] = [];
 const managers: DesktopLoginManager[] = [];

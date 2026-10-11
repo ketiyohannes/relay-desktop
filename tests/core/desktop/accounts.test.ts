@@ -8,8 +8,9 @@ import {
 	type AccountCatalogLoader,
 	claudeAccountCatalog,
 	codexAccountCatalog,
-} from "../../../src/core/desktop/accounts.ts";
-import type { DesktopAccount, DesktopState } from "../../../src/core/desktop/types.ts";
+} from "../../../src/core/accounts/catalog.ts";
+import type { DesktopAccount } from "../../../src/core/accounts/types.ts";
+import type { DesktopState } from "../../../src/core/desktop/types.ts";
 import { DesktopRuntime } from "./offline-runtime.ts";
 
 const directories: string[] = [];

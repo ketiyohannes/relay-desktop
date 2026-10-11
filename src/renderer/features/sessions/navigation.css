@@ -1,0 +1,27 @@
+.navigation { display: flex; flex-direction: column; border-right: 1px solid var(--line); padding: 0 6px; }
+.panel-label { height: 38px; display: flex; gap: 6px; align-items: center; font-size: 12px; color: var(--muted); font-weight: 500; padding: 0 6px; }
+.panel-label button { margin-left: auto; }
+.panel-label button + button { margin-left: 0; }
+.projects { overflow: auto; flex: 1; }
+.project { margin: 0 0 6px; }
+.project-name { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; padding-left: 4px; }
+.project > summary { cursor: pointer; list-style: none; min-height: 28px; }
+.project > summary::-webkit-details-marker { display: none; }
+.project > summary::before { content: '›'; color: var(--muted); }
+.project[open] > summary::before { transform: rotate(90deg); }
+.project-name > .icon { color: var(--muted); }
+.project-title { flex: 1; }
+.project-name span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.project-name button { border: 0; color: var(--muted); }
+.session-button { width: calc(100% - 10px); display: flex; align-items: start; gap: 6px; text-align: left; border: 1px solid transparent; margin: 1px 0 0 10px; padding: 5px 7px; font-size: 12px; color: var(--muted); border-radius: 5px; }
+.session-button > .icon { flex-shrink: 0; margin-top: 3px; }
+.session-copy { flex: 1; min-width: 0; }
+.session-name { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.session-meta { display: block; margin-top: 1px; font: 400 10px/1.4 var(--sans); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.session-button.selected { background: var(--selected); color: var(--ink); border-color: var(--line); }
+.recent { border-top: 1px solid var(--line); padding-bottom: 8px; }
+.recent .panel-label { height: 32px; color: var(--muted); font-size: 12px; }
+.recent button { display: block; text-align: left; border: 0; padding: 5px 6px; width: 100%; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.recent small { display: block; margin-top: 2px; font: 10px var(--sans); color: var(--muted); }
+.account-button { border: 0; padding: 9px 6px; margin: 2px 0 6px; display: flex; align-items: center; gap: 7px; text-align: left; font-size: 12px; color: var(--muted); }
+.account-arrow { margin-left: auto; color: var(--muted); }

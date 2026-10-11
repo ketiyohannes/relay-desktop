@@ -30,12 +30,17 @@ for (const section of ["dependencies", "devDependencies", "optionalDependencies"
 }
 
 // Inspect the application's real TypeScript project, rather than synthesizing workspace configs.
-const config = resolve(root, "tsconfig.json");
+const configs = ["tsconfig.json", "tsconfig.renderer.json"].map(name => resolve(root, name));
 const api = new API({ cwd: root });
 try {
-	const project = api.updateSnapshot({ openProjects: [config] }).getProject(config);
+	const snapshot = api.updateSnapshot({ openProjects: configs });
+	const checked = new Set();
+	for (const config of configs) {
+	const project = snapshot.getProject(config);
 	if (!project) throw new Error("TypeScript project was not loaded");
 	for (const file of project.rootFiles) {
+		if (checked.has(file)) continue;
+		checked.add(file);
 		const source = project.program.getSourceFile(file);
 		const runtime = file.startsWith(resolve(root, "src") + "/");
 		const fail = (node, message) => {
@@ -46,11 +51,16 @@ try {
 			if (isImportTypeNode(node) || (isCallExpression(node) && node.expression.kind === SyntaxKind.ImportKeyword))
 				fail(node, "inline imports are forbidden");
 			if ((isImportDeclaration(node) || isExportDeclaration(node)) && node.moduleSpecifier && isStringLiteral(node.moduleSpecifier)) {
-				for (const message of checkImport(file, node.moduleSpecifier.text, runtime)) fail(node, message);
+				const clause = node.importClause;
+				const bindings = clause?.namedBindings;
+				const typeOnly = node.isTypeOnly || clause?.phaseModifier === SyntaxKind.TypeKeyword ||
+					(!clause?.name && bindings?.kind === SyntaxKind.NamedImports && bindings.elements.length > 0 && bindings.elements.every(entry => entry.isTypeOnly));
+				for (const message of checkImport(file, node.moduleSpecifier.text, runtime && !typeOnly, typeOnly)) fail(node, message);
 			}
 			node.forEachChild(visit);
 		}
 		visit(source);
+	}
 	}
 } finally {
 	api.close();
@@ -59,7 +69,7 @@ if (failures.length) {
 	for (const message of failures) console.error(message);
 	process.exit(1);
 }
-console.log("Application imports, core boundaries, and dependency pins pass.");
+console.log("Application imports, process/feature boundaries, and dependency pins pass.");
 
 await prepareUi();
 const renderer = new URL("../src/renderer/", import.meta.url);
@@ -68,6 +78,7 @@ for (const [, asset] of html.matchAll(/(?:src|href)=["']([^"']+)["']/g)) {
 	if (!asset.startsWith("http")) await access(new URL(asset, renderer));
 }
 await build({ entryPoints: [fileURLToPath(new URL("app.js", renderer))], bundle: true, platform: "browser", format: "esm", write: false });
+await build({ entryPoints: [fileURLToPath(new URL("style.css", renderer))], bundle: true, loader: { ".svg": "dataurl" }, write: false });
 for (const [entry, format] of [["main/index.ts", "esm"], ["preload/index.ts", "cjs"], ["main/worker.ts", "esm"]]) {
 	await build({ entryPoints: [resolve(root, "src", entry)], bundle: true, platform: "node", format, packages: "external", write: false });
 }

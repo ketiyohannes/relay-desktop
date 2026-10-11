@@ -4,6 +4,7 @@ import { appendFile, mkdir, mkdtemp, readFile, realpath, rm, writeFile } from "n
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, test } from "node:test";
+import { prepareHandoff } from "../../src/core/handoffs/context.ts";
 import type {
 	Backend,
 	Capability,
@@ -13,8 +14,7 @@ import type {
 	RuntimeEvent,
 	RuntimeSelection,
 	TurnInput,
-} from "../../src/core/contracts.ts";
-import { prepareHandoff } from "../../src/core/handoffs/context.ts";
+} from "../../src/core/runtimes/types.ts";
 import { RelayApplication } from "../../src/core/service/application.ts";
 
 const roots: string[] = [];

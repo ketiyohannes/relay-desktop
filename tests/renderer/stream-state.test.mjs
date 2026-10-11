@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { mergeDesktopUpdate } from '../../src/renderer/stream-state.js';
+import { mergeDesktopUpdate } from '../../src/renderer/features/conversation/stream-state.js';
 
 test('streaming updates retain history, replace actions once, and preserve session settings', () => {
   const history = { id: 'old', text: 'Existing history' };

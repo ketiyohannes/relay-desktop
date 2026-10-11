@@ -7,12 +7,13 @@ import { monitorEventLoopDelay, performance } from "node:perf_hooks";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
-import type { RelaySession, RuntimeAdapter } from "../../src/core/contracts.ts";
-import { DesktopEngineBridge } from "../../src/core/desktop/engines.ts";
+import { DesktopEngineBridge } from "../../src/core/desktop/service-connection.ts";
+import type { RuntimeAdapter } from "../../src/core/runtimes/types.ts";
 import { RelayApplication } from "../../src/core/service/application.ts";
 import { RelayClient } from "../../src/core/service/client.ts";
 import { RelayServer } from "../../src/core/service/server.ts";
 import { SessionLedger } from "../../src/core/sessions/ledger.ts";
+import type { RelaySession } from "../../src/core/sessions/types.ts";
 
 const execute = promisify(execFile);
 

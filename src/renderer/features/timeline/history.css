@@ -1,0 +1,8 @@
+.timeline-controls, .search-options, .search-navigation, .code-actions { display: flex; align-items: center; gap: 8px; }
+.timeline-controls { padding: 5px 0; }
+.timeline-controls select { flex: 1; border: 0; background: var(--panel); padding: 6px; font-size: 12px; }
+#timeline-search { margin: 5px 0 10px; min-width: 0; width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 8px; font-size: 13px; }
+#project-history { min-height: 0; overflow: auto; }
+.history-group { border-bottom: 1px solid var(--line); padding: 6px 0; }
+.history-group summary { cursor: pointer; padding: 8px 3px; font-size: 13px; overflow-wrap: anywhere; }
+.history-event { display: block; width: 100%; text-align: left; border: 0; padding: 8px 12px; font: 12px/1.6 var(--mono); color: var(--muted); }

@@ -1,4 +1,4 @@
-import type { ExecutionStatus, RuntimeConnection, RuntimeEvent, TurnInput } from "../contracts.ts";
+import type { ExecutionStatus, RuntimeConnection, RuntimeEvent, TurnInput } from "../runtimes/types.ts";
 
 export type HostedControl =
 	| { turnId: string; type: "cancel" }

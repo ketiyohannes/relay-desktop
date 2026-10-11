@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import * as diff from 'diff';
 import test from 'node:test';
-import { diffRows } from '../../src/renderer/code-view.js';
-import { buildTree } from '../../src/renderer/file-tree.js';
+import { diffRows } from '../../src/renderer/ui/code-view.js';
+import { buildTree } from '../../src/renderer/ui/file-tree.js';
 
 
 test('diff rows show source and old/new positions without Git headers', () => {

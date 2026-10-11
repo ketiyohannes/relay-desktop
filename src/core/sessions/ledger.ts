@@ -1,8 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { mkdir, open, readdir, readFile, rm, truncate } from "node:fs/promises";
 import { join } from "node:path";
-import type { LedgerData, LedgerEvent, RelaySession } from "../contracts.ts";
 import { syncDirectory } from "../storage/durable.ts";
+import type { LedgerData, LedgerEvent, RelaySession } from "./types.ts";
 import { validateLedgerEvent } from "./validation.ts";
 
 export function project(events: LedgerEvent[]): RelaySession {

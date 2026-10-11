@@ -1,0 +1,33 @@
+:root {
+  color-scheme: light;
+  --paper: #fafafa; --panel: #fdfdfd; --surface: #fff; --hover: #f4f4f5; --selected: #fff;
+  --ink: #27272a; --muted: #71717a; --line: #e4e4e7; --orange: #2563eb;
+  --accent: oklch(0.488 0.217 264); --accent-hover: oklch(0.54 0.217 264); --error: #a83532; --error-bg: #fff0ee;
+  --green: #64866c; --backdrop: #15171a66;
+  --code-keyword: #8250b3; --code-string: #116329; --code-number: #0550ae; --code-title: #953800; --code-comment: #6e7781;
+  --diff-add: #dafbe1; --diff-remove: #ffebe9; --diff-add-ink: #116329; --diff-remove-ink: #a40e26;
+  --mono: 'SFMono-Regular', 'Menlo', 'Consolas', monospace;
+  --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --display: var(--sans);
+  --chat: var(--sans);
+  --sidebar-width: 240px; --details-width: 280px; --chat-width: 736px; --control-radius: 8px;
+  color: var(--ink); background: var(--paper); font: 400 14px/1.5 var(--sans); -webkit-font-smoothing: antialiased;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --paper: #111; --panel: #0a0a0a; --surface: #121212; --hover: #1b1b1b; --selected: #202020;
+  --ink: #f5f5f5; --muted: #999; --line: #ffffff0f; --orange: #8cabff;
+  --accent: oklch(0.571 0.21 264); --accent-hover: oklch(0.62 0.21 264);
+  --error: #f29b96; --error-bg: #342321; --green: #8aa892; --backdrop: #070809a6;
+  --code-keyword: #d2a8ff; --code-string: #a5d6a7; --code-number: #79c0ff; --code-title: #ffa657; --code-comment: #8b949e;
+  --diff-add: #183024; --diff-remove: #382124; --diff-add-ink: #7ee787; --diff-remove-ink: #ffa198;
+}
+* { box-sizing: border-box; }
+body { margin: 0; height: 100vh; overflow: hidden; }
+button, input, textarea, select { font: inherit; color: inherit; }
+button, select { cursor: pointer; }
+button { border: 1px solid var(--line); border-radius: var(--control-radius); background: transparent; padding: 7px 10px; }
+button:hover { background: var(--hover); }
+button:focus, input:focus, select:focus, textarea:focus, summary:focus { outline: none; }
+:root[data-keyboard-focus='true'] :is(button, input, select, textarea, summary):focus-visible { outline: 1px solid var(--muted); outline-offset: 2px; }
+button:disabled { opacity: .45; cursor: default; }
