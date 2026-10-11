@@ -1,9 +1,10 @@
 import { createHash, randomUUID } from "node:crypto";
 import { type FSWatcher, watch } from "node:fs";
 import { realpath, rm, stat } from "node:fs/promises";
-import { isAbsolute, join, relative, resolve, sep } from "node:path";
+import { isAbsolute, join, relative, resolve } from "node:path";
 import { ModelRuntime } from "pi-sdk";
 import { ReadOnlyAuthStorage } from "../accounts/readonly-credentials.ts";
+import { PermissionGate } from "../permissions/gate.ts";
 import { mergeDuplicateAccounts } from "./account-identity.ts";
 import { type AccountCatalogLoader, loadAccountCatalog } from "./accounts.ts";
 import { ApprovalPresenter } from "./approvals.ts";
@@ -359,18 +360,25 @@ export class DesktopRuntime {
 	}
 	private async publish(settled = false): Promise<void> {
 		this.flushStream();
-		clearTimeout(this.persistTimer);
-		this.persistTimer = undefined;
-		this.dirtySessions.clear();
-		if (!this.abort) this.store.state.busySession = [...this.externalActive][0];
-		await this.bridge?.recordNotes(this.store.state);
-		await this.store.save();
 		if (settled) {
 			this.abort = undefined;
 			this.switching = false;
 			this.store.state.busySession = [...this.externalActive][0];
 		}
-		if (this.initialized) this.host.state(this.publicState());
+		clearTimeout(this.persistTimer);
+		this.persistTimer = undefined;
+		this.dirtySessions.clear();
+		if (!this.abort) this.store.state.busySession = [...this.externalActive][0];
+		try {
+			await this.bridge?.recordNotes(this.store.state);
+			delete this.store.state.persistenceError;
+			await this.store.save();
+		} catch (error) {
+			this.store.state.persistenceError = `Desktop state is unsaved: ${error instanceof Error ? error.message : String(error)}`;
+			throw error;
+		} finally {
+			if (this.initialized) this.host.state(this.publicState());
+		}
 	}
 	private streamEvent(
 		session: DesktopSession,
@@ -515,6 +523,10 @@ export class DesktopRuntime {
 		}
 	}
 	async command(command: DesktopCommand): Promise<DesktopResult> {
+		if (command.type === "retry_save") {
+			await this.publish();
+			return this.publicState();
+		}
 		if (command.type === "recovery")
 			return { recovery: (await this.bridge?.recovery(this.store.session(command.sessionId).project)) ?? [] };
 		if (command.type === "reconcile") {
@@ -912,8 +924,9 @@ export class DesktopRuntime {
 				await this.publish();
 			} catch (error) {
 				this.abort = undefined;
-				delete this.store.state.busySession;
+				this.store.state.busySession = [...this.externalActive][0];
 				if (reviewDirectory) await rm(reviewDirectory, { recursive: true, force: true });
+				this.host.state(this.publicState());
 				throw error;
 			}
 			void this.run(session, text, this.abort, review, reviewDirectory).catch((error: unknown) => {
@@ -1088,16 +1101,7 @@ export class DesktopRuntime {
 						return true;
 					return this.host.permission(tool, input, scope, signal);
 				}
-				if (!["read", "grep", "find", "ls", "Read", "Grep", "Glob"].includes(tool)) return false;
-				const args = input && typeof input === "object" ? (input as Record<string, unknown>) : {};
-				const path =
-					typeof args.file_path === "string" ? args.file_path : typeof args.path === "string" ? args.path : ".";
-				try {
-					const local = relative(await realpath(readOnlyRoot), await realpath(resolve(readOnlyRoot, path)));
-					return local !== ".." && !local.startsWith(`..${sep}`) && !isAbsolute(local);
-				} catch {
-					return false;
-				}
+				return new PermissionGate().check("read-only", readOnlyRoot, tool, input, async () => {});
 			},
 			session: async (id) => {
 				if (review) return;
@@ -1315,9 +1319,12 @@ export class DesktopRuntime {
 					action.text += "\nInterrupted; the tool outcome is unknown. Inspect working files before continuing.";
 				}
 			}
-			await callbacks.checkpoint("Run settled");
-			if (reviewDirectory && !uncertain) await rm(reviewDirectory, { recursive: true, force: true });
-			await this.publish(true);
+			try {
+				await callbacks.checkpoint("Run settled");
+				if (reviewDirectory && !uncertain) await rm(reviewDirectory, { recursive: true, force: true });
+			} finally {
+				await this.publish(true);
+			}
 		}
 	}
 }

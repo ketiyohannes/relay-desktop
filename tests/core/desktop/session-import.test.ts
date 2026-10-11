@@ -286,6 +286,7 @@ it("loads history before direct provider selection and prompting, and reports un
 	});
 	await runtime.command({ type: "prompt", sessionId, text: "Continue" });
 	await expect.poll(() => runtime.store.state.busySession).toBeUndefined();
+	await runtime.settled();
 	expect(context).toContain("Shared source history");
 	await writeFile(join(file.root, "invalid.jsonl"), "invalid\n");
 	const result = await runtime.command({ type: "refresh_sessions" });
@@ -309,7 +310,8 @@ it("imports Codex messages once, pairs tool results, retains unfinished tools, a
 	expect(items).toHaveLength(1);
 	const preview = await importer.preview(items[0].id);
 	expect(preview.actions.map((action) => action.kind)).toEqual(["user", "tool", "tool", "assistant"]);
-	expect(preview.actions[1]).toMatchObject({ status: "done", output: "done" });
+	// R05: output without a reliable native status is not proof of success.
+	expect(preview.actions[1]).toMatchObject({ status: "unknown", output: "done" });
 	expect(preview.actions[2].status).toBe("error");
 	expect(JSON.stringify(preview)).not.toContain("secret");
 	expect(await readFile(file.path)).toEqual(before);
@@ -438,6 +440,7 @@ it("persists one imported session, permits viewing missing projects, relinks and
 	});
 	await runtime.command({ type: "prompt", sessionId: session.id, text: "Continue" });
 	await expect.poll(() => runtime.store.state.busySession).toBeUndefined();
+	await runtime.settled();
 	expect(contexts[0]).toContain("Remember the completed edit");
 	expect(contexts[0]).toContain("written");
 	const store = new DesktopStore(directory);

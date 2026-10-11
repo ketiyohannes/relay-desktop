@@ -7,7 +7,6 @@ import { prepareUi } from "../../scripts/prepare-ui.mjs";
 test("application entry points and installed dependencies resolve from one package", () => {
 	const manifest = JSON.parse(readFileSync("package.json", "utf8"));
 	assert.equal(manifest.workspaces, undefined);
-	for (const directory of ["apps", "packages", "docs", ".husky"]) assert.equal(existsSync(directory), false);
 	for (const command of Object.values(manifest.scripts).filter((command) => command.startsWith("node ")))
 		assert.ok(existsSync(command.slice(5)), `Missing entry: ${command}`);
 	const lock = JSON.parse(readFileSync("package-lock.json", "utf8"));

@@ -404,6 +404,29 @@ test("Claude read-only sessions exclude write tools and private text blocks from
 	const invoke = mockQuery(async function* (options) {
 		assert.deepEqual(options.settingSources, []);
 		assert.ok(options.disallowedTools?.includes("Write"));
+		assert.equal(typeof options.settings, "object");
+		assert.equal(
+			(options.settings as Exclude<Options["settings"], string | undefined>).permissions
+				?.blockReadsOutsideWorkingDirectories,
+			true,
+		);
+		const denied = await options.hooks!.PreToolUse![0].hooks[0](
+			{
+				hook_event_name: "PreToolUse",
+				session_id: "native",
+				transcript_path: "/native",
+				cwd: "/project",
+				tool_name: "Glob",
+				tool_input: { pattern: "/outside/*" },
+				tool_use_id: "glob",
+			},
+			"glob",
+			{ signal: new AbortController().signal },
+		);
+		assert.equal(
+			(denied as { hookSpecificOutput: { permissionDecision: string } }).hookSpecificOutput.permissionDecision,
+			"deny",
+		);
 		yield {
 			type: "assistant",
 			session_id: "native-claude",

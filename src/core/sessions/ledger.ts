@@ -3,6 +3,7 @@ import { mkdir, open, readdir, readFile, rm, truncate } from "node:fs/promises";
 import { join } from "node:path";
 import type { LedgerData, LedgerEvent, RelaySession } from "../contracts.ts";
 import { syncDirectory } from "../storage/durable.ts";
+import { validateLedgerEvent } from "./validation.ts";
 
 export function project(events: LedgerEvent[]): RelaySession {
 	const first = events[0];
@@ -23,62 +24,64 @@ export function project(events: LedgerEvent[]): RelaySession {
 		turns: [],
 		events,
 	};
-	for (const event of events) {
-		session.updated = event.time;
-		const data = event.data;
-		switch (data.type) {
-			case "selection":
-				session.selection = data.selection;
-				break;
-			case "workspace":
-				session.workspace = data.workspace;
-				session.branch = data.branch;
-				break;
-			case "branch":
-				session.branch = data.branch;
-				break;
-			case "native": {
-				const index = session.natives.findIndex((record) => record.id === data.record.id);
-				if (index < 0) session.natives.push(data.record);
-				else session.natives[index] = data.record;
-				break;
+	for (const event of events) applyEvent(session, event);
+	return session;
+}
+
+function applyEvent(session: RelaySession, event: LedgerEvent): void {
+	session.updated = event.time;
+	const data = event.data;
+	switch (data.type) {
+		case "selection":
+			session.selection = data.selection;
+			break;
+		case "workspace":
+			session.workspace = data.workspace;
+			session.branch = data.branch;
+			break;
+		case "branch":
+			session.branch = data.branch;
+			break;
+		case "native": {
+			const index = session.natives.findIndex((record) => record.id === data.record.id);
+			if (index < 0) session.natives.push(data.record);
+			else session.natives[index] = data.record;
+			break;
+		}
+		case "turn": {
+			const index = session.turns.findIndex((turn) => turn.id === data.turnId);
+			const value = {
+				id: data.turnId,
+				nativeRecordId: data.nativeRecordId,
+				taskId: data.taskId,
+				status: data.status,
+			};
+			if (index < 0) session.turns.push(value);
+			else session.turns[index] = value;
+			break;
+		}
+		case "approval": {
+			const index = session.approvals.findIndex((approval) => approval.id === data.approval.id);
+			if (index < 0) session.approvals.push(data.approval);
+			else session.approvals[index] = data.approval;
+			break;
+		}
+		case "task": {
+			const index = session.tasks.findIndex((task) => task.id === data.task.id);
+			if (index < 0) session.tasks.push({ ...data.task });
+			else session.tasks[index] = { ...data.task };
+			break;
+		}
+		case "reconciled": {
+			const turn = session.turns.find((turn) => turn.id === data.turnId);
+			if (turn) {
+				turn.status = "failed";
+				const task = session.tasks.find((task) => task.id === turn.taskId);
+				if (task) task.status = "failed";
 			}
-			case "turn": {
-				const index = session.turns.findIndex((turn) => turn.id === data.turnId);
-				const value = {
-					id: data.turnId,
-					nativeRecordId: data.nativeRecordId,
-					taskId: data.taskId,
-					status: data.status,
-				};
-				if (index < 0) session.turns.push(value);
-				else session.turns[index] = value;
-				break;
-			}
-			case "approval": {
-				const index = session.approvals.findIndex((approval) => approval.id === data.approval.id);
-				if (index < 0) session.approvals.push(data.approval);
-				else session.approvals[index] = data.approval;
-				break;
-			}
-			case "task": {
-				const index = session.tasks.findIndex((task) => task.id === data.task.id);
-				if (index < 0) session.tasks.push({ ...data.task });
-				else session.tasks[index] = { ...data.task };
-				break;
-			}
-			case "reconciled": {
-				const turn = session.turns.find((turn) => turn.id === data.turnId);
-				if (turn) {
-					turn.status = "failed";
-					const task = session.tasks.find((task) => task.id === turn.taskId);
-					if (task) task.status = "failed";
-				}
-				break;
-			}
+			break;
 		}
 	}
-	return session;
 }
 
 /** Recovery identities and statuses only; ephemeral conversation/tool content stays in memory. */
@@ -110,6 +113,10 @@ function recoveryMetadata(data: LedgerData): LedgerData {
 export class SessionLedger {
 	readonly directory: string;
 	private readonly sessions = new Map<string, LedgerEvent[]>();
+	private readonly projections = new Map<string, RelaySession>();
+	private readonly edits = new Map<string, Map<string, string>>();
+	private readonly workspaces = new Map<string, Set<string>>();
+	private readonly sizes = new Map<string, number[]>();
 	private pending: Promise<unknown> = Promise.resolve();
 	private failed = false;
 	constructor(directory: string) {
@@ -146,19 +153,29 @@ export class SessionLedger {
 				.split("\n")
 				.filter(Boolean)
 				.map((line, index) => {
-					const value = JSON.parse(line) as LedgerEvent;
-					if (
-						value.version !== 1 ||
-						value.sequence !== index + 1 ||
-						value.sessionId !== file.slice(0, -6) ||
-						!value.data?.type
-					)
-						throw new Error(`Invalid journal ${file} at sequence ${index + 1}`);
+					let value: LedgerEvent;
+					try {
+						value = validateLedgerEvent(JSON.parse(line));
+						if (
+							value.sequence !== index + 1 ||
+							value.sessionId !== file.slice(0, -6) ||
+							(index === 0) !== (value.data.type === "created")
+						)
+							throw new Error("Invalid journal sequence or creation boundary");
+					} catch (error) {
+						throw new Error(`Invalid journal ${file} at sequence ${index + 1}: ${String(error)}`);
+					}
 					return value;
 				});
 			if (events.length) {
-				project(events);
-				this.sessions.set(file.slice(0, -6), events);
+				const id = file.slice(0, -6);
+				this.sessions.set(id, events);
+				this.projections.set(id, project(events));
+				this.sizes.set(
+					id,
+					events.map((event) => Buffer.byteLength(JSON.stringify(event))),
+				);
+				for (const event of events) this.indexEvent(event);
 			}
 		}
 	}
@@ -175,14 +192,53 @@ export class SessionLedger {
 	snapshot(id: string, after = 0): RelaySession {
 		const events = this.sessions.get(id);
 		if (!events) throw new Error("Unknown Relay session");
-		const session = project(events);
-		return structuredClone({ ...session, events: events.filter((event) => event.sequence > after) });
+		const session = this.projections.get(id)!;
+		return structuredClone({ ...session, events: events.slice(after) });
+	}
+	/** Byte-bounded page; a single large event uses the transport's chunked transfer. */
+	page(
+		id: string,
+		after = 0,
+		byteLimit = 1024 * 1024,
+		through?: number,
+	): RelaySession & { next?: number; through: number } {
+		const events = this.sessions.get(id);
+		if (!events) throw new Error("Unknown Relay session");
+		const boundary = Math.min(through ?? events.length, events.length);
+		const sizes = this.sizes.get(id)!;
+		let end = Math.min(after, boundary);
+		let bytes = 0;
+		while (end < boundary && (end === after || bytes + sizes[end] <= byteLimit)) bytes += sizes[end++];
+		return structuredClone({
+			...this.projections.get(id)!,
+			events: events.slice(after, end),
+			through: boundary,
+			...(end < boundary ? { next: end } : {}),
+		});
 	}
 	metadata(): Omit<RelaySession, "events">[] {
-		return [...this.sessions.values()].map((events) => {
-			const { events: _events, ...session } = project(events);
-			return structuredClone(session);
-		});
+		return [...this.projections.values()].map(({ events: _events, ...session }) => structuredClone(session));
+	}
+	private indexEvent(event: LedgerEvent): void {
+		const { sessionId, data } = event;
+		if (data.type === "created" || data.type === "workspace") {
+			for (const ids of this.workspaces.values()) ids.delete(sessionId);
+			const ids = this.workspaces.get(data.workspace) ?? new Set<string>();
+			ids.add(sessionId);
+			this.workspaces.set(data.workspace, ids);
+		}
+		if (data.type === "manual_edit") {
+			const edits = this.edits.get(sessionId) ?? new Map<string, string>();
+			edits.set(data.operationId, data.status);
+			this.edits.set(sessionId, edits);
+		}
+	}
+	workspaceBlocked(workspace: string): boolean {
+		for (const id of this.workspaces.get(workspace) ?? []) {
+			if (this.projections.get(id)!.turns.some((turn) => turn.status === "unknown")) return true;
+			for (const status of this.edits.get(id)?.values() ?? []) if (status !== "completed") return true;
+		}
+		return false;
 	}
 	forgetEphemeral(id: string): Promise<void> {
 		const operation = this.pending.then(async () => {
@@ -190,6 +246,10 @@ export class SessionLedger {
 			await rm(join(this.directory, `${id}.jsonl`));
 			await syncDirectory(this.directory);
 			this.sessions.delete(id);
+			this.projections.delete(id);
+			this.sizes.delete(id);
+			this.edits.delete(id);
+			for (const ids of this.workspaces.values()) ids.delete(id);
 		});
 		this.pending = operation.catch(() => {});
 		return operation;
@@ -227,7 +287,15 @@ export class SessionLedger {
 			} finally {
 				await handle.close();
 			}
-			this.sessions.set(id, [...events, event]);
+			events.push(event);
+			this.sessions.set(id, events);
+			const projection = this.projections.get(id);
+			if (projection) applyEvent(projection, event);
+			else this.projections.set(id, project(events));
+			const sizes = this.sizes.get(id) ?? [];
+			sizes.push(Buffer.byteLength(JSON.stringify(event)));
+			this.sizes.set(id, sizes);
+			this.indexEvent(event);
 			return structuredClone(event);
 		});
 		this.pending = operation.catch(() => {});

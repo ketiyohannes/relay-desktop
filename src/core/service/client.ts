@@ -4,8 +4,9 @@ import { readFile } from "node:fs/promises";
 import { connect, type Socket } from "node:net";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import type { LedgerEvent } from "../contracts.ts";
+import type { LedgerEvent, RelaySession } from "../contracts.ts";
 import { serviceBuild } from "./build.ts";
+import { FrameReader, FrameWriter } from "./frames.ts";
 import type { HostedControl } from "./hosted.ts";
 import { applicationDirectory, socketPath } from "./paths.ts";
 import type { RelayCommand, Request, Response } from "./protocol.ts";
@@ -17,7 +18,7 @@ export class RelayServiceVersionError extends Error {}
 export class RelayClient {
 	private readonly socket: Socket;
 	private readonly token: string;
-	private buffer = "";
+	private readonly writer = new FrameWriter();
 	private readonly listeners = new Set<(event: LedgerEvent) => void>();
 	private readonly pending = new Map<string, { resolve(value: unknown): void; reject(error: Error): void }>();
 	private readonly disconnects = new Set<() => void>();
@@ -26,19 +27,11 @@ export class RelayClient {
 		this.socket = socket;
 		this.token = token;
 		socket.setEncoding("utf8");
+		const reader = new FrameReader();
 		socket.on("data", (chunk: string) => {
-			this.buffer += chunk;
-			if (Buffer.byteLength(this.buffer) > 16 * 1024 * 1024) {
-				socket.destroy(new Error("Relay response exceeded frame limit"));
-				return;
-			}
-			let newline = this.buffer.indexOf("\n");
-			while (newline >= 0) {
-				const frame = this.buffer.slice(0, newline);
-				this.buffer = this.buffer.slice(newline + 1);
-				newline = this.buffer.indexOf("\n");
-				try {
-					const message = JSON.parse(frame) as
+			try {
+				reader.read(chunk, (value) => {
+					const message = value as
 						| Response
 						| { version: 1; event: LedgerEvent }
 						| { version: 1; control: HostedControl };
@@ -52,9 +45,9 @@ export class RelayClient {
 						if (message.error) pending?.reject(new Error(message.error));
 						else pending?.resolve(message.result);
 					}
-				} catch (error) {
-					socket.destroy(error instanceof Error ? error : new Error(String(error)));
-				}
+				});
+			} catch (error) {
+				socket.destroy(error instanceof Error ? error : new Error(String(error)));
 			}
 		});
 		const fail = () => {
@@ -168,7 +161,29 @@ export class RelayClient {
 		this.controls.add(listener);
 		return () => this.controls.delete(listener);
 	}
-	request(command: RelayCommand): Promise<unknown> {
+	async request(command: RelayCommand): Promise<unknown> {
+		const result = await this.requestFrame(command);
+		if (command.type !== "get" && command.type !== "create") return result;
+		const session = result as RelaySession & { next?: number; through?: number };
+		let next = session.next;
+		while (next !== undefined) {
+			const page = (await this.requestFrame({
+				type: "get",
+				sessionId: session.id,
+				after: next,
+				through: session.through,
+			})) as RelaySession & {
+				next?: number;
+			};
+			if (page.next !== undefined && page.next <= next) throw new Error("Journal page cursor did not advance");
+			session.events.push(...page.events);
+			next = page.next;
+		}
+		delete session.next;
+		delete session.through;
+		return session;
+	}
+	private requestFrame(command: RelayCommand): Promise<unknown> {
 		const id = randomUUID();
 		const request: Request = { version: 1, id, token: this.token, command };
 		return new Promise((resolve, reject) => {
@@ -177,7 +192,7 @@ export class RelayClient {
 				return;
 			}
 			this.pending.set(id, { resolve, reject });
-			this.socket.write(`${JSON.stringify(request)}\n`);
+			this.writer.send(this.socket, request);
 		});
 	}
 	close(): void {

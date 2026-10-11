@@ -32,7 +32,8 @@ tests/
 scripts/                Development, packaging, assets, checks, and test runner
 ```
 
-One application uses one package manifest, lockfile, and TypeScript configuration.
+One application uses one package manifest and lockfile. TypeScript checks core/process
+code and maintained renderer JavaScript through separate Node and browser configurations.
 Separate workspace packages add dependency and packaging overhead without an independent
 release target. The source folders still enforce process and product boundaries:
 `core` cannot import Electron or the frontend, and the renderer talks through preload IPC.
@@ -63,7 +64,7 @@ Commands run from the repository root:
 | `npm run preview` | Serve the browser-only UI at `http://127.0.0.1:4318` |
 | `npm run build:desktop` | Package Relay Desktop for the host macOS architecture |
 | `npm run icons` | Regenerate the selected Phosphor SVG assets |
-| `npm run check` | Format/lint, type-check, validate imports and pins, resolve app entries |
+| `npm run check` | Format/lint maintained source, type-check core and renderer bridge contracts, validate imports and pins, resolve app entries |
 | `./test.sh` | Run all offline Relay tests with isolated data and no provider keys |
 | `npm run relay -- --help` | Show CLI commands |
 | `npm run relay:pi -- --help` | Host the published pi terminal |
@@ -100,6 +101,9 @@ one imports its supported public history into Relay; the original transcript rem
 unchanged. Continuing creates a Relay-managed native conversation. Imports do not copy
 private reasoning, subagent threads, native permissions, or historical file snapshots.
 Relay handoff wrappers and automatic continuation prompts are hidden from chat.
+Codex imported tool outcomes require explicit native error flags or structured command
+exit codes. Outputs without reliable status appear as Outcome unknown; their text is
+retained. Failed tools may have partial effects and remain uncertain in public handoffs.
 
 Switching runtimes transfers bounded public conversation, completed outcomes, artifacts,
 and task state. Completed effects remain evidence; Relay does not replay their tool
@@ -136,6 +140,21 @@ The local service authenticates clients over a private Unix socket or Windows pi
 It stores `ledger/`, `native/`, `artifacts/`, and `resources/`, plus its token and lock.
 Ledger writes are serialized and synced. A torn final record is backed up and repaired;
 malformed complete records fail visibly. The service is a local single writer.
+The desktop also runs as one instance per data directory. Shared desktop saves acquire
+a process lock and reject stale index revisions before writing conversation files.
+Dead process locks are recovered using their recorded ownership. If ownership cannot
+be established, startup names the lock directory to move aside after stopping all Relay
+processes; keep session journals in place.
+
+Editor saves sync replacement content before rename and sync the parent directory
+before recording completion. Directory sync is unavailable on Windows. Failed file
+durability or lease cleanup retains an uncertain edit for inspection and reconciliation.
+When execution settles but desktop persistence fails, the UI reports unsaved state and
+offers Retry saving. A successful retry clears the error without restarting execution.
+
+Desktop queries have a deadline. Mutating commands remain pending after the deadline
+and deliver late replies; a worker disconnect reports their completion as unknown.
+Inspect state and effects before retrying an operation with an unknown result.
 
 Cancellation requests are distinct from verified settlement. Lost connections or tool
 starts without outcomes retain workspace ownership and stop automatic continuation.
@@ -156,7 +175,10 @@ installed/authenticated runtimes and explicit resource/MCP configuration. Relay 
 no browser broker or remote process environment. Commands must reference credentials
 through environment variable names or profiles, never durable command arguments.
 
-Very large histories remain limited by in-memory projections and 16 MiB transport frames.
+History retrieval uses bounded pages with a fixed event boundary. Messages larger than
+the 16 MiB wire frame limit use ordered chunks with socket backpressure, including tool
+broadcasts and imports. Very large histories remain limited by in-memory projections
+and complete-message reassembly. Each journal append is still synced before acknowledgment.
 Offline checks validate app wiring and behavior, not live subscriptions or native inference.
 Report reproducible security boundary bypasses privately to the maintainer without
 credentials or private transcripts.

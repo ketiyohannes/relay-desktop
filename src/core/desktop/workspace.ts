@@ -1,9 +1,10 @@
 import { execFile } from "node:child_process";
 import { randomUUID } from "node:crypto";
-import { lstat, readdir, readFile, realpath, rename, rm, stat, writeFile } from "node:fs/promises";
+import { lstat, open, readdir, readFile, realpath, rename, rm, stat } from "node:fs/promises";
 import { homedir } from "node:os";
 import { dirname, isAbsolute, relative, resolve, sep } from "node:path";
 import { promisify } from "node:util";
+import { syncDirectory } from "../storage/durable.ts";
 import { isChangePath, visibleChanges } from "./change-filter.ts";
 import { expandTildePath } from "./config.ts";
 import type { DirectoryView, EditorFile, SnapshotView } from "./types.ts";
@@ -44,12 +45,19 @@ export async function saveEditorFile(
 	const temporary = resolve(dirname(target), `.relay-edit-${randomUUID()}`);
 	const original = await lstat(target);
 	try {
-		await writeFile(temporary, content, { flag: "wx", mode: original.mode & 0o777 });
+		const replacement = await open(temporary, "wx", original.mode & 0o777);
+		try {
+			await replacement.writeFile(content);
+			await replacement.sync();
+		} finally {
+			await replacement.close();
+		}
 		const latest = await editorFile(root, path);
 		const info = await lstat(target);
 		if (latest.content !== expected || original.ino !== info.ino || original.dev !== info.dev)
 			throw new Error("File changed on disk. Reload it before saving; your draft has been kept.");
 		await rename(temporary, target);
+		await syncDirectory(dirname(target));
 	} finally {
 		await rm(temporary, { force: true });
 	}

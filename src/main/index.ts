@@ -1,8 +1,8 @@
 import { type ChildProcess, fork } from "node:child_process";
-import { randomUUID } from "node:crypto";
 import { realpath } from "node:fs/promises";
 import { delimiter, dirname, join } from "node:path";
 import { app, BrowserWindow, ipcMain, shell } from "electron";
+import { DesktopRequests } from "../core/desktop/requests.ts";
 import type { DesktopCommand, DesktopLogin, DesktopState, DesktopUpdate } from "../core/desktop/types.ts";
 import { applicationDirectory } from "../core/service/paths.ts";
 
@@ -18,34 +18,33 @@ if (app.isPackaged) {
 	].join(delimiter);
 }
 let worker: ChildProcess | undefined;
-const requests = new Map<string, { resolve(value: unknown): void; reject(error: Error): void }>();
+const requests = new DesktopRequests();
 let window: BrowserWindow;
 
 function request(command: DesktopCommand): Promise<unknown> {
-	return new Promise((resolve, reject) => {
-		if (!worker?.connected) return reject(new Error("Agent worker unavailable"));
-		const id = randomUUID();
-		const timer = setTimeout(() => {
-			requests.delete(id);
-			reject(new Error("Agent worker timed out"));
-		}, 30000);
-		requests.set(id, {
-			resolve: (value) => {
-				clearTimeout(timer);
-				resolve(value);
-			},
-			reject: (error) => {
-				clearTimeout(timer);
-				reject(error);
-			},
-		});
-		worker.send({ id, command });
-	});
+	if (!worker?.connected) return Promise.reject(new Error("Agent worker unavailable"));
+	return requests.request(
+		command,
+		(id, command) => worker!.send({ id, command }),
+		(message) => {
+			if (!window.isDestroyed()) window.webContents.send("relay:error", message);
+		},
+	);
 }
 
 async function startDesktop(root: string): Promise<void> {
 	app.setName("Relay Desktop");
 	app.setPath("userData", process.env.RELAY_DATA_DIR || join(app.getPath("appData"), "Relay"));
+	if (!app.requestSingleInstanceLock()) {
+		app.quit();
+		return;
+	}
+	app.on("second-instance", () => {
+		if (window) {
+			if (window.isMinimized()) window.restore();
+			window.focus();
+		}
+	});
 	await app.whenReady();
 	window = new BrowserWindow({
 		width: 1440,
@@ -113,10 +112,7 @@ async function startDesktop(root: string): Promise<void> {
 		}) => {
 			if (message.type === "login" && !window.isDestroyed()) window.webContents.send("relay:login", message.login);
 			if (message.type === "response") {
-				const pending = requests.get(message.id);
-				requests.delete(message.id);
-				if (message.error) pending?.reject(new Error(message.error));
-				else pending?.resolve(message.result);
+				requests.complete(message.id, message.result, message.error);
 			}
 			if (message.type === "state" && !window.isDestroyed()) window.webContents.send("relay:state", message.state);
 			if (message.type === "update" && !window.isDestroyed()) window.webContents.send("relay:update", message.update);
@@ -128,13 +124,11 @@ async function startDesktop(root: string): Promise<void> {
 		},
 	);
 	worker.on("exit", () => {
-		for (const pending of requests.values()) pending.reject(new Error("Agent worker exited"));
-		requests.clear();
+		requests.disconnected();
 		if (!window.isDestroyed()) window.webContents.send("relay:error", "Agent worker exited. Restart Relay.");
 	});
 	worker.on("error", (error) => {
-		for (const pending of requests.values()) pending.reject(error);
-		requests.clear();
+		requests.disconnected();
 		if (!window.isDestroyed()) window.webContents.send("relay:error", `Agent worker failed: ${error.message}`);
 	});
 	await window.loadFile(join(root, "src/renderer/index.html"));

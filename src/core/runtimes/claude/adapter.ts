@@ -206,6 +206,7 @@ class ClaudeConnection implements RuntimeConnection {
 			},
 			...(input.permissionMode === "read-only"
 				? {
+						settings: { permissions: { blockReadsOutsideWorkingDirectories: true } },
 						tools: ["Read", "Grep", "Glob"],
 						disallowedTools: ["Bash", "Edit", "Write", "NotebookEdit", "Agent", "Task"],
 					}
