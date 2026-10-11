@@ -2,6 +2,7 @@ import { createHash, randomUUID } from "node:crypto";
 import { mkdir, readFile, rename } from "node:fs/promises";
 import { join } from "node:path";
 import { syncDirectory, writePrivateFile } from "../storage/durable.ts";
+import { ProcessLock } from "../storage/process-lock.ts";
 import type { DesktopAction, DesktopSession, DesktopState } from "./types.ts";
 
 export class DesktopStore {
@@ -10,6 +11,7 @@ export class DesktopStore {
 	private pending: Promise<void> = Promise.resolve();
 	private readonly saved = new Map<string, string>();
 	private index = "";
+	private revision = "";
 	private historyPath(id: string): string {
 		return join(this.directory, "conversations", `${createHash("sha256").update(id).digest("hex")}.json`);
 	}
@@ -22,7 +24,8 @@ export class DesktopStore {
 		try {
 			const raw = await readFile(join(this.directory, "state.json"), "utf8");
 			found = true;
-			const stored = JSON.parse(raw) as DesktopState & { storageVersion?: number };
+			this.revision = raw;
+			const stored = JSON.parse(raw) as DesktopState & { storageVersion?: number; storageRevision?: string };
 			this.state = stored;
 			if (stored.storageVersion === 1) {
 				for (const session of this.state.sessions) {
@@ -39,6 +42,7 @@ export class DesktopStore {
 				await writePrivateFile(join(this.directory, "state.legacy.json"), raw);
 			}
 			delete stored.storageVersion;
+			delete stored.storageRevision;
 			delete this.state.busySession;
 			for (const session of this.state.sessions) {
 				if (
@@ -69,24 +73,40 @@ export class DesktopStore {
 		const data = JSON.stringify({
 			...this.state,
 			storageVersion: 1,
+			storageRevision: randomUUID(),
 			sessions: this.state.sessions.map((session) => ({ ...session, actions: [] })),
 		});
 		const operation = this.pending.then(async () => {
-			await mkdir(join(this.directory, "conversations"), { recursive: true, mode: 0o700 });
-			for (const history of histories) {
-				if (this.saved.get(history.id) === history.data) continue;
-				const path = this.historyPath(history.id);
-				await writePrivateFile(`${path}.tmp`, history.data);
-				await rename(`${path}.tmp`, path);
-				await syncDirectory(join(this.directory, "conversations"));
-				this.saved.set(history.id, history.data);
+			const lock = await ProcessLock.acquire(join(this.directory, "desktop-write.lock"));
+			try {
+				const revision = await readFile(join(this.directory, "state.json"), "utf8").catch(
+					(error: NodeJS.ErrnoException) => {
+						if (error.code === "ENOENT") return "";
+						throw error;
+					},
+				);
+				if (revision !== this.revision)
+					throw new Error("Desktop state changed in another writer. Reopen Relay before saving.");
+				await mkdir(join(this.directory, "conversations"), { recursive: true, mode: 0o700 });
+				for (const history of histories) {
+					if (this.saved.get(history.id) === history.data) continue;
+					const path = this.historyPath(history.id);
+					const temporary = `${path}.${randomUUID()}.tmp`;
+					await writePrivateFile(temporary, history.data);
+					await rename(temporary, path);
+					await syncDirectory(join(this.directory, "conversations"));
+					this.saved.set(history.id, history.data);
+				}
+				if (this.index === data) return;
+				const temporary = join(this.directory, `state.json.${randomUUID()}.tmp`);
+				await writePrivateFile(temporary, data);
+				await rename(temporary, join(this.directory, "state.json"));
+				this.revision = data;
+				await syncDirectory(this.directory);
+				this.index = data;
+			} finally {
+				await lock.release();
 			}
-			if (this.index === data) return;
-			const temporary = join(this.directory, "state.json.tmp");
-			await writePrivateFile(temporary, data);
-			await rename(temporary, join(this.directory, "state.json"));
-			await syncDirectory(this.directory);
-			this.index = data;
 		});
 		this.pending = operation.catch(() => {});
 		return operation;

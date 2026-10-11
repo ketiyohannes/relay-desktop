@@ -21,14 +21,32 @@ export class PermissionGate {
 		if (mode === "read-only") {
 			if (!reads.has(tool)) return false;
 			const args = input && typeof input === "object" ? (input as Record<string, unknown>) : {};
+			if (tool === "Glob" || tool === "find") {
+				if (
+					typeof args.pattern !== "string" ||
+					isAbsolute(args.pattern) ||
+					/^[A-Za-z]:|^\\\\|^~[/\\]|(?:^|[,({])[/\\]|(?:^|[/\\,({])\.\.(?:$|[/\\,})])/.test(args.pattern)
+				)
+					return false;
+			}
 			const path =
 				typeof args.file_path === "string" ? args.file_path : typeof args.path === "string" ? args.path : ".";
 			try {
 				const canonical = await realpath(resolve(workspace, path));
-				for (const allowed of readPaths)
+				for (const allowed of tool === "Read" || tool === "read" ? readPaths : [])
 					if (canonical === (await realpath(allowed).catch(() => undefined))) return true;
 				const local = relative(await realpath(workspace), canonical);
-				return local !== ".." && !local.startsWith(`..${sep}`) && !isAbsolute(local);
+				if (local === ".." || local.startsWith(`..${sep}`) || isAbsolute(local)) return false;
+				if (tool === "Glob" || tool === "find") {
+					// Resolve literal directories before the first wildcard so a symlink
+					// cannot redirect a relative pattern outside its approved search root.
+					const components = (args.pattern as string).split(/[\\/]/);
+					const wildcard = components.findIndex((part) => /[*?[{(]/.test(part));
+					const prefix = components.slice(0, wildcard < 0 ? components.length : wildcard).join(sep);
+					const target = relative(await realpath(workspace), await realpath(resolve(canonical, prefix)));
+					if (target === ".." || target.startsWith(`..${sep}`) || isAbsolute(target)) return false;
+				}
+				return true;
 			} catch {
 				return false;
 			}

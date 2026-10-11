@@ -31,7 +31,7 @@ export interface DesktopAction {
 	/** Provider that produced this action, retained when switching accounts. */
 	provider?: string;
 	toolId?: string;
-	status?: "running" | "done" | "error";
+	status?: "running" | "done" | "error" | "unknown";
 	input?: string;
 	output?: string;
 	progress?: string;
@@ -78,6 +78,8 @@ export interface DesktopState {
 	sessions: DesktopSession[];
 	accounts: DesktopAccount[];
 	busySession?: string;
+	/** The in-memory projection is retained and can be saved again. */
+	persistenceError?: string;
 	sessionDiscovery?: { refreshing: boolean; warnings: string[] };
 }
 
@@ -88,6 +90,7 @@ export interface DesktopUpdate {
 }
 
 export type DesktopCommand =
+	| { type: "retry_save" }
 	| { type: "recovery"; sessionId: string }
 	| { type: "reconcile"; sessionId: string; turnId: string; description: string }
 	| { type: "refresh_sessions"; force?: boolean }

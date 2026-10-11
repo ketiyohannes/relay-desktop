@@ -16,7 +16,7 @@ export type RelayCommand =
 	| { type: "hello" }
 	| { type: "upgrade"; build: string }
 	| { type: "list" }
-	| { type: "get"; sessionId: string; after?: number }
+	| { type: "get"; sessionId: string; after?: number; through?: number }
 	| { type: "recovery"; workspace: string }
 	| { type: "copy_attachment"; sessionId: string; sourceSessionId: string; attachmentId: string }
 	| {

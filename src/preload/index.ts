@@ -1,11 +1,13 @@
 import { contextBridge, ipcRenderer } from "electron";
+import type { DesktopBridge, DesktopCommandResult } from "../core/desktop/bridge.ts";
 import type { DesktopCommand, DesktopLogin, DesktopState, DesktopUpdate } from "../core/desktop/types.ts";
 
 contextBridge.exposeInMainWorld("relay", {
 	onLogin: (callback: (state: DesktopLogin) => void) => {
 		ipcRenderer.on("relay:login", (_event, state: DesktopLogin) => callback(state));
 	},
-	command: (command: DesktopCommand) => ipcRenderer.invoke("relay:command", command),
+	command: <C extends DesktopCommand>(command: C): Promise<DesktopCommandResult<C>> =>
+		ipcRenderer.invoke("relay:command", command),
 	reveal: (path: string) => ipcRenderer.invoke("relay:reveal", path),
 	permission: (id: string, allowed: boolean, allowRun = false) =>
 		ipcRenderer.invoke("relay:permission", id, allowed, allowRun),
@@ -25,4 +27,4 @@ contextBridge.exposeInMainWorld("relay", {
 	onError: (callback: (message: string) => void) => {
 		ipcRenderer.on("relay:error", (_event, message: string) => callback(message));
 	},
-});
+} satisfies DesktopBridge);

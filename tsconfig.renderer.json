@@ -1,0 +1,6 @@
+{
+ "extends": "./tsconfig.json",
+ "compilerOptions": {"allowJs": true, "checkJs": true, "strict": false, "module": "ESNext", "moduleResolution": "Bundler", "lib": ["ES2024", "DOM", "DOM.Iterable"]},
+ "include": ["src/renderer/**/*.js", "src/renderer/**/*.d.ts"],
+ "exclude": ["src/renderer/highlight.js", "src/renderer/marked.js", "src/renderer/diff.js", "node_modules"]
+}

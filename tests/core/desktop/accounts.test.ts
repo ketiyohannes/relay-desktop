@@ -344,6 +344,7 @@ describe("account catalogs and model selection", () => {
 		});
 		await runtime.command({ type: "prompt", sessionId: session.id, text: "Test" });
 		await expect.poll(() => runtime.store.state.busySession).toBeUndefined();
+		await runtime.settled();
 		expect(
 			observed.some((state) =>
 				state.sessions[0]?.actions.some(

@@ -9,7 +9,7 @@ const ui = new URL("../src/renderer/", import.meta.url);
 const types = { ".html": "text/html", ".css": "text/css", ".js": "text/javascript", ".svg": "image/svg+xml", ".woff2": "font/woff2" };
 const server = createServer(async (request, response) => {
 	const name = request.url === "/" ? "index.html" : request.url?.slice(1);
-	if (!["index.html", "style.css", "icons.css", "app.js", "settings.js", "select-control.js", "session-import.js", "account-controls.js", "model-options.js", "stream-state.js", "code-view.js", "file-tree.js", "workspace-tools.js", "theme.js", "marked.js", "highlight.js", "diff.js"].includes(name) && !/^icons\/[a-z-]+\.svg$/.test(name || "")) { response.writeHead(404).end(); return; }
+	if (!["index.html", "style.css", "icons.css", "app.js", "dom.js", "settings.js", "select-control.js", "session-import.js", "account-controls.js", "model-options.js", "stream-state.js", "code-view.js", "file-tree.js", "workspace-tools.js", "theme.js", "marked.js", "highlight.js", "diff.js"].includes(name) && !/^icons\/[a-z-]+\.svg$/.test(name || "")) { response.writeHead(404).end(); return; }
 	try {
 		const body = await readFile(fileURLToPath(new URL(name, ui)));
 		response.writeHead(200, { "Content-Type": types[name.slice(name.lastIndexOf("."))] }).end(body);

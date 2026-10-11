@@ -126,7 +126,7 @@ export class DesktopEngineBridge {
 					id: action.id,
 					kind: action.kind as ProductNote["kind"],
 					text: action.text,
-					...(action.status ? { status: action.status } : {}),
+					...(action.status && action.status !== "unknown" ? { status: action.status } : {}),
 					...(action.snapshot ? { snapshot: action.snapshot } : {}),
 					...(action.previous ? { previous: action.previous } : {}),
 					...(action.files ? { files: action.files } : {}),

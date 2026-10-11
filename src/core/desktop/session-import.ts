@@ -363,14 +363,15 @@ export class DesktopSessionImporter {
 			});
 			tools.set(id, action);
 		};
-		const result = (id: string, output: unknown, timestamp: unknown, failed = false) => {
+		const result = (id: string, output: unknown, timestamp: unknown, failed?: boolean) => {
 			let action = tools.get(id);
+			const orphan = !action;
 			if (!action) {
 				call(id, "Imported tool result", {}, timestamp);
 				action = tools.get(id)!;
 			}
 			action.output = contentText(output);
-			action.status = failed ? "error" : "done";
+			action.status = failed === true ? "error" : failed === false && !orphan ? "done" : "unknown";
 			action.finished = Date.parse(string(timestamp)) || action.time;
 		};
 		let resolvedSource = { ...source };
@@ -427,6 +428,12 @@ export class DesktopSessionImporter {
 					}
 			}
 		} else {
+			const commandResults = new Map<string, boolean>();
+			for (const entry of records) {
+				const body = object(entry.payload);
+				if (entry.type === "event_msg" && body.type === "exec_command_end" && Number.isSafeInteger(body.exit_code))
+					commandResults.set(string(body.call_id), body.exit_code !== 0);
+			}
 			const meta = object(records.find((entry) => entry.type === "session_meta")?.payload);
 			if (meta.id !== source.sessionId) throw new Error("Source session changed; refresh the import list");
 			if (internalCodexSession(meta)) throw new Error("Internal agent sessions are not chat conversations");
@@ -445,7 +452,12 @@ export class DesktopSessionImporter {
 					} else if (["function_call", "custom_tool_call"].includes(string(body.type)))
 						call(string(body.call_id), string(body.name), body.arguments ?? body.input, entry.timestamp);
 					else if (["function_call_output", "custom_tool_call_output"].includes(string(body.type)))
-						result(string(body.call_id), body.output, entry.timestamp);
+						result(
+							string(body.call_id),
+							body.output,
+							entry.timestamp,
+							typeof body.is_error === "boolean" ? body.is_error : commandResults.get(string(body.call_id)),
+						);
 				} else if (
 					entry.type === "event_msg" &&
 					!hasResponses &&

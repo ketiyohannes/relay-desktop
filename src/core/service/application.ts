@@ -387,7 +387,7 @@ export class RelayApplication {
 		if (previous) return previous.status;
 		if (this.active.has(id)) throw new Error("Session already running");
 		if (this.unreconciled(session)) throw new Error("Reconcile interrupted execution before continuing");
-		if (this.ledger.list().some((other) => other.workspace === session.workspace && this.unreconciled(other)))
+		if (this.ledger.workspaceBlocked(session.workspace))
 			throw new Error("Workspace has unreconciled execution in another session");
 		const selectionKey = JSON.stringify(session.selection);
 		let record = [...session.natives]
@@ -905,11 +905,9 @@ export class RelayApplication {
 		const session = this.ledger.get(id);
 		if (session.events.some((event) => event.data.type === "manual_edit" && event.data.operationId === operationId))
 			throw new Error("Edit already recorded; inspect file contents before another save");
-		if (this.ledger.list().some((entry) => entry.workspace === session.workspace && this.unreconciled(entry)))
-			throw new Error("Workspace requires reconciliation");
+		if (this.ledger.workspaceBlocked(session.workspace)) throw new Error("Workspace requires reconciliation");
 		const lease = await this.resources.acquire(`workspace:${session.workspace}`, `${id}:edit:${operationId}`);
 		let recorded = false;
-		let settled = false;
 		try {
 			await this.append(id, { type: "manual_edit", operationId, path, status: "prepared" });
 			recorded = true;
@@ -921,13 +919,13 @@ export class RelayApplication {
 				status: "completed",
 				sha256: createHash("sha256").update(content).digest("hex"),
 			});
-			settled = true;
+			await this.resources.release(lease);
 			return file;
 		} catch (error) {
 			if (recorded) await this.append(id, { type: "manual_edit", operationId, path, status: "unknown" });
 			throw error;
 		} finally {
-			if (!recorded || settled) await this.resources.release(lease);
+			if (!recorded) await this.resources.release(lease);
 		}
 	}
 	private unreconciled(session: RelaySession): boolean {

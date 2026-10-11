@@ -62,6 +62,7 @@ it.each(["ask", "auto-approve", "full-access", "read-only"] as const)(
 		await file.runtime.command({ type: "session_permissions", sessionId: file.session.id, mode });
 		await file.runtime.command({ type: "prompt", sessionId: file.session.id, text: "Inspect the code" });
 		await expect.poll(() => file.runtime.store.state.busySession).toBeUndefined();
+		await file.runtime.settled();
 		expect(results).toEqual(mode === "read-only" ? [true, false, false, false, false] : [true, true, true, true, true]);
 		expect(readOnly).toBe(mode === "read-only");
 		expect(file.permission).toHaveBeenCalledTimes(mode === "ask" ? 5 : mode === "auto-approve" ? 2 : 0);
@@ -94,6 +95,7 @@ it("rejects unknown modes and changes during an active run", async () => {
 	} finally {
 		finish();
 		await expect.poll(() => file.runtime.store.state.busySession).toBeUndefined();
+		await file.runtime.settled();
 	}
 });
 
@@ -106,6 +108,7 @@ it.each(["auto-approve", "full-access"] as const)("does not override a native es
 	await file.runtime.command({ type: "session_permissions", sessionId: file.session.id, mode });
 	await file.runtime.command({ type: "prompt", sessionId: file.session.id, text: "Inspect" });
 	await expect.poll(() => file.runtime.store.state.busySession).toBeUndefined();
+	await file.runtime.settled();
 	expect(allowed).toBe(false);
 	expect(file.permission).toHaveBeenCalledOnce();
 });

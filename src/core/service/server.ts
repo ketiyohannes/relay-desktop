@@ -1,22 +1,23 @@
 import { randomUUID, timingSafeEqual } from "node:crypto";
-import { chmod, mkdir, readFile, rename, rm } from "node:fs/promises";
+import { chmod, mkdir, rm } from "node:fs/promises";
 import { createServer, type Server, type Socket } from "node:net";
 import { join } from "node:path";
 import type { LedgerEvent } from "../contracts.ts";
 import { syncDirectory, writePrivateFile } from "../storage/durable.ts";
+import { ProcessLock } from "../storage/process-lock.ts";
 import type { RelayApplication } from "./application.ts";
 import { serviceBuild } from "./build.ts";
+import { FrameReader, FrameWriter } from "./frames.ts";
 import { HostedConnection, type HostedControl } from "./hosted.ts";
 import { socketPath } from "./paths.ts";
 import type { RelayCommand, Request, Response } from "./protocol.ts";
 import { validateHostedEvent, validateSelection } from "./protocol.ts";
 
-const maxFrame = 16 * 1024 * 1024;
-
 export class RelayServer {
 	private readonly application: RelayApplication;
 	private readonly directory: string;
 	private readonly sockets = new Set<Socket>();
+	private readonly writers = new Map<Socket, FrameWriter>();
 	private readonly hosts = new Map<
 		string,
 		{ socket: Socket; sessionId: string; connection: HostedConnection; execution: Promise<unknown> }
@@ -24,7 +25,7 @@ export class RelayServer {
 	private server?: Server;
 	private token = "";
 	private unsubscribe?: () => void;
-	private owned = false;
+	private lock?: ProcessLock;
 	private upgrading = false;
 	private pendingCommands = 0;
 	constructor(application: RelayApplication, directory: string) {
@@ -34,35 +35,8 @@ export class RelayServer {
 	async start(): Promise<void> {
 		await serviceBuild();
 		await mkdir(this.directory, { recursive: true, mode: 0o700 });
-		const lock = join(this.directory, "service.lock");
+		this.lock = await ProcessLock.acquire(join(this.directory, "service.lock"));
 		try {
-			await mkdir(lock, { mode: 0o700 });
-		} catch (error) {
-			if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
-			const recovery = join(this.directory, "service-recovery.lock");
-			await mkdir(recovery, { mode: 0o700 });
-			try {
-				const owner = JSON.parse(await readFile(join(lock, "owner.json"), "utf8")) as { pid: number };
-				if (!Number.isSafeInteger(owner.pid) || owner.pid <= 0)
-					throw new Error("Invalid service lock owner; inspect before recovery");
-				try {
-					process.kill(owner.pid, 0);
-					throw new Error("Relay service already running");
-				} catch (failure) {
-					if ((failure as NodeJS.ErrnoException).code !== "ESRCH") throw failure;
-				}
-				const obsolete = `${lock}.dead-${randomUUID()}`;
-				await rename(lock, obsolete);
-				await mkdir(lock, { mode: 0o700 });
-				await rm(obsolete, { recursive: true });
-			} finally {
-				await rm(recovery, { recursive: true });
-			}
-		}
-		this.owned = true;
-		try {
-			await writePrivateFile(join(lock, "owner.json"), JSON.stringify({ pid: process.pid }));
-			await syncDirectory(lock);
 			this.token = randomUUID();
 			await writePrivateFile(join(this.directory, "service.token"), this.token);
 			await syncDirectory(this.directory);
@@ -81,14 +55,16 @@ export class RelayServer {
 		}
 	}
 	private accept(socket: Socket): void {
-		let buffer = "";
+		const reader = new FrameReader();
 		let authenticated = false;
 		const submissions = new Map<string, { sessionId: string; turnId: string }>();
 		this.sockets.add(socket);
+		this.writers.set(socket, new FrameWriter());
 		socket.setEncoding("utf8");
 		socket.on("error", () => socket.destroy());
 		socket.on("close", () => {
 			this.sockets.delete(socket);
+			this.writers.delete(socket);
 			for (const [turnId, host] of this.hosts)
 				if (host.socket === socket) {
 					host.connection.disconnect();
@@ -99,57 +75,52 @@ export class RelayServer {
 				void this.application.cancel(sessionId, turnId).catch(() => {});
 		});
 		socket.on("data", (chunk: string) => {
-			buffer += chunk;
-			if (Buffer.byteLength(buffer) > maxFrame) {
-				socket.destroy();
-				return;
-			}
-			let newline = buffer.indexOf("\n");
-			while (newline >= 0) {
-				const frame = buffer.slice(0, newline);
-				buffer = buffer.slice(newline + 1);
-				newline = buffer.indexOf("\n");
-				let request: Request;
-				try {
-					request = JSON.parse(frame) as Request;
-					const received = Buffer.from(request.token || "");
-					const expected = Buffer.from(this.token);
-					if (
-						request.version !== 1 ||
-						typeof request.id !== "string" ||
-						received.length !== expected.length ||
-						!timingSafeEqual(received, expected)
-					) {
+			try {
+				reader.read(chunk, (message) => {
+					let request: Request;
+					try {
+						request = message as Request;
+						const received = Buffer.from(request.token || "");
+						const expected = Buffer.from(this.token);
+						if (
+							request.version !== 1 ||
+							typeof request.id !== "string" ||
+							received.length !== expected.length ||
+							!timingSafeEqual(received, expected)
+						) {
+							socket.destroy();
+							return;
+						}
+						authenticated = true;
+					} catch {
 						socket.destroy();
 						return;
 					}
-					authenticated = true;
-				} catch {
-					socket.destroy();
-					return;
-				}
-				const sessionId = request.command?.type === "submit" ? request.command.sessionId : undefined;
-				const turnId = request.command?.type === "submit" ? request.command.turnId : undefined;
-				this.pendingCommands++;
-				const operation = this.socketCommand(socket, request.command, () => {
-					if (!sessionId || !turnId) return;
-					submissions.set(request.id, { sessionId, turnId });
-					if (socket.destroyed) void this.application.cancel(sessionId, turnId).catch(() => {});
-				});
-				void operation
-					.then(
-						(result) => this.send(socket, { version: 1, id: request.id, result }),
-						(error: unknown) =>
-							this.send(socket, {
-								version: 1,
-								id: request.id,
-								error: error instanceof Error ? error.message : String(error),
-							}),
-					)
-					.finally(() => {
-						this.pendingCommands--;
-						submissions.delete(request.id);
+					const sessionId = request.command?.type === "submit" ? request.command.sessionId : undefined;
+					const turnId = request.command?.type === "submit" ? request.command.turnId : undefined;
+					this.pendingCommands++;
+					const operation = this.socketCommand(socket, request.command, () => {
+						if (!sessionId || !turnId) return;
+						submissions.set(request.id, { sessionId, turnId });
+						if (socket.destroyed) void this.application.cancel(sessionId, turnId).catch(() => {});
 					});
+					void operation
+						.then(
+							(result) => this.send(socket, { version: 1, id: request.id, result }),
+							(error: unknown) =>
+								this.send(socket, {
+									version: 1,
+									id: request.id,
+									error: error instanceof Error ? error.message : String(error),
+								}),
+						)
+						.finally(() => {
+							this.pendingCommands--;
+							submissions.delete(request.id);
+						});
+				});
+			} catch {
+				socket.destroy();
 			}
 		});
 		// Broadcasts must only reach authenticated clients.
@@ -159,20 +130,7 @@ export class RelayServer {
 		socket: Socket,
 		response: Response | { version: 1; event: LedgerEvent } | { version: 1; control: HostedControl },
 	): void {
-		if (socket.destroyed) return;
-		const frame = `${JSON.stringify(response)}\n`;
-		if (Buffer.byteLength(frame) > maxFrame) {
-			if ("id" in response)
-				socket.write(
-					`${JSON.stringify({ version: 1, id: response.id, error: "Response too large; export the session journal from the application directory" })}\n`,
-				);
-			return;
-		}
-		if (socket.writableLength > maxFrame) {
-			socket.destroy();
-			return;
-		}
-		socket.write(frame);
+		if (!socket.destroyed) this.writers.get(socket)?.send(socket, response);
 	}
 	private broadcast(event: LedgerEvent): void {
 		for (const socket of this.sockets)
@@ -259,7 +217,9 @@ export class RelayServer {
 			case "get":
 				if (command.after !== undefined && (!Number.isSafeInteger(command.after) || command.after < 0))
 					throw new Error("Invalid journal cursor");
-				return this.application.ledger.snapshot(command.sessionId, command.after);
+				if (command.through !== undefined && (!Number.isSafeInteger(command.through) || command.through < 0))
+					throw new Error("Invalid journal boundary");
+				return this.application.ledger.page(command.sessionId, command.after, undefined, command.through);
 			case "recovery":
 				return this.application.recovery(command.workspace);
 			case "attach":
@@ -267,8 +227,10 @@ export class RelayServer {
 			case "copy_attachment":
 				return this.application.copyAttachment(command.sessionId, command.sourceSessionId, command.attachmentId);
 			case "create": {
+				if (command.after !== undefined && (!Number.isSafeInteger(command.after) || command.after < 0))
+					throw new Error("Invalid journal cursor");
 				if (this.application.ledger.has(command.sessionId))
-					return this.application.ledger.snapshot(command.sessionId, command.after);
+					return this.application.ledger.page(command.sessionId, command.after);
 				return this.application.create(
 					command.workspace,
 					validateSelection(command.selection),
@@ -336,9 +298,9 @@ export class RelayServer {
 		await this.application.shutdown();
 		for (const socket of this.sockets) socket.destroy();
 		if (this.server?.listening) await new Promise<void>((resolve) => this.server!.close(() => resolve()));
-		if (this.owned) {
-			await rm(join(this.directory, "service.lock"), { recursive: true, force: true });
-			this.owned = false;
+		if (this.lock) {
+			await this.lock.release();
+			this.lock = undefined;
 		}
 	}
 }

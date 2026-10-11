@@ -13,6 +13,7 @@ const root = fileURLToPath(new URL("../", import.meta.url));
 for (const arguments_ of [
 	["node_modules/@biomejs/biome/bin/biome", "check", "--write", "--error-on-warnings", "."],
 	["node_modules/typescript/bin/tsc", "--noEmit"],
+	["node_modules/typescript/bin/tsc", "--project", "tsconfig.renderer.json", "--noEmit"],
 ]) {
 	const result = spawnSync(process.execPath, arguments_, { cwd: root, stdio: "inherit" });
 	if (result.error) throw result.error;

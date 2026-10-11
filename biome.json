@@ -21,6 +21,13 @@
 		"lineWidth": 120
 	},
 	"files": {
-		"includes": ["src/**/*.ts", "tests/**/*.ts"]
+		"includes": [
+			"src/**/*.ts",
+			"tests/**/*.ts",
+			"src/renderer/**/*.js",
+			"!src/renderer/highlight.js",
+			"!src/renderer/marked.js",
+			"!src/renderer/diff.js"
+		]
 	}
 }
